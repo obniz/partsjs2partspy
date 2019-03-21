@@ -1,6 +1,6 @@
 import asyncio
 
-class _24_lc256:
+class _24LC256:
     def __init__(self):
         self.required_keys = ['address']
         self.keys = ['sda', 'scl', 'clock', 'pull', 'i2c', 'address']

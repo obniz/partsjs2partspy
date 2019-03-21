@@ -1,6 +1,6 @@
 import asyncio
 
-class _kxsc7_2050:
+class KXSC7_2050:
     def __init__(self):
         self.keys = ['x', 'y', 'z', 'vcc', 'gnd']
         self.required_keys = ['x', 'y', 'z']

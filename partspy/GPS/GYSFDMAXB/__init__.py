@@ -1,6 +1,6 @@
 import datetime
 
-class _gysfdmaxb:
+class GYSFDMAXB:
     def __init__(self):
         self.keys = ['vcc', 'txd', 'rxd', 'gnd', 'Opps']
         self.required_keys = ['txd', 'rxd']
@@ -24,11 +24,11 @@ class _gysfdmaxb:
         self.uart.start(*[{'tx': self.params.txd, 'rx': self.params.rxd, 'baud': 9600, 'drive': '3v'}])
         self.edited_data = }
         self.edited_data.enable = False
-        self.edited_data._gpgsv = [0] * 4
+        self.edited_data.GPGSV = [0] * 4
         self.on1pps = null
         self.last1pps = 0
         self.gps_info = }
-        self.gps_info._sentence_type = {'_gpgga': 0x0001, '_gpgsa': 0x0002, '_gpgsv': 0x0004, '_gprmc': 0x0008, '_gpvtg': 0x0010, '_gpzda': 0x0020}
+        self.gps_info._sentence_type = {'GPGGA': 0x0001, 'GPGSA': 0x0002, 'GPGSV': 0x0004, 'GPRMC': 0x0008, 'GPVTG': 0x0010, 'GPZDA': 0x0020}
         self.gps_info.status = 'V'
         self.gps_info.sentences = []
         self.gps_info.satellite_info = {'satellites': [], 'in_view': 0}
@@ -40,9 +40,7 @@ class _gysfdmaxb:
             self.obniz.get_ad(*[self._opps]).self = self
             self.obniz.get_ad(*[self._opps]).start(*[# TODO: failed to generate Function Expression])
         else:
-            self.last1pps = 2
-            self.obniz.get_ad(*[self._opps]).self = self
-            self.obniz.get_ad(*[self._opps]).start(*[# TODO: failed to generate Function Expression])
+            self.obniz.get_ad(*[self._opps]).end()
 
     def read_sentence(self):
         results = []
@@ -60,7 +58,7 @@ class _gysfdmaxb:
         format = None
         sentence = self.read_sentence()
         self.edited_data.enable = False
-        self.edited_data._gpgsv = [0] * 4
+        self.edited_data.GPGSV = [0] * 4
         while sentence.length > 0:
             part = sentence.split(*[','])
             if sentence.slice(*[-4, -3]) != ',':
@@ -69,24 +67,24 @@ class _gysfdmaxb:
                 part[part.length - 2] = st
             self.edited_data.sentence = part.join(*[','])
             if part[0]=='$GPGGA':
-                self.edited_data._gpgga = part
+                self.edited_data.GPGGA = part
             elif part[0]=='$GPGLL':
-                self.edited_data._gpgll = part
+                self.edited_data.GPGLL = part
             elif part[0]=='$GPGSA':
-                self.edited_data._gpgsa = part
+                self.edited_data.GPGSA = part
             elif part[0]=='$GPGSV':
                 n = _number(*[part[2]])
-                if n > self.edited_data._gpgsv.length:
-                    while n > self.edited_data._gpgsv.length:
-                        self.edited_data._gpgsv.push(*[[]])
-                self.edited_data._gpgsv[n - 1] = part
+                if n > self.edited_data.GPGSV.length:
+                    while n > self.edited_data.GPGSV.length:
+                        self.edited_data.GPGSV.push(*[[]])
+                self.edited_data.GPGSV[n - 1] = part
             elif part[0]=='$GPRMC':
-                self.edited_data._gprmc = part
+                self.edited_data.GPRMC = part
             elif part[0]=='$GPVTG':
-                self.edited_data._gpvtg = part
+                self.edited_data.GPVTG = part
             elif part[0]=='$GPZDA':
-                self.edited_data._gpzda = part
-                utc = part[4] + '/' + part[3] + '/' + part[2] + ' ' + part[1].substring(*[0, 2]) + ':' + part[1].substring(*[2, 4]) + ':' + part[1].substring(*[4, 6]) + ' +00:00'
+                self.edited_data.GPZDA = part
+                utc = str(str(str(str(str(str(part[4]) + '/' + part[3]) + '/' + part[2]) + ' ' + part[1].substring(*[0, 2])) + ':' + part[1].substring(*[2, 4])) + ':' + part[1].substring(*[4, 6])) + ' +00:00'
                 self.edited_data.timestamp = datetime.datetime.now()
             else:
                 format = part[0].substr(*[1])
@@ -101,8 +99,8 @@ class _gysfdmaxb:
         edited_data = edited_data or self.get_edited_data()
         self.gps_info.status = 'V'
         if edited_data.enable:
-            if edited_data._gpgga:
-                gga = edited_data._gpgga
+            if edited_data.GPGGA:
+                gga = edited_data.GPGGA
                 self.gps_info.gps_quality = parse_float(*[gga[6]])
                 self.gps_info.hdop = parse_float(*[gga[8]])
                 self.gps_info.altitude = parse_float(*[gga[9]])
@@ -110,39 +108,45 @@ class _gysfdmaxb:
                 self.gps_info.latitude = latitude if gga[3] == 'N' else -latitude
                 longitude = self.nmea2dd(*[parse_float(*[gga[4]])])
                 self.gps_info.longitude = longitude if gga[5] == 'E' else -longitude
-                self.gps_info.sentences.add(*[self.gps_info._sentence_type._gpgga])
-            if edited_data._gpgsv:
+                self.gps_info.sentences.add(*[self.gps_info._sentence_type.GPGGA])
+            if edited_data.GPGSV:
+                for n in range(0, edited_data.GPGSV.length, 1):
+
                 # TODO: failed to generate FOR statement
-            if edited_data._gpgsa:
-                gsa = edited_data._gpgsa
+            if edited_data.GPGSA:
+                gsa = edited_data.GPGSA
                 nuse = 0
                 self.gps_info.fix_mode = parse_float(*[gsa[2]])
                 self.gps_info.pdop = parse_float(*[gsa[15]])
                 self.gps_info.hdop = parse_float(*[gsa[16]])
                 self.gps_info.vdop = parse_float(*[gsa[17]])
-                # TODO: failed to generate FOR statement
+                for i in range(0, NMEA_MAXSAT, 1):
+                    for j in range(0, self.gps_info.satellite_info.in_view, 1):
+                        if self.gps_info.satellite_info.satellites[j] and gsa[i + 3] == self.gps_info.satellite_info.satellites[j].id:
+                            self.gps_info.satellite_info.satellites[j].in_use = True
+
                 self.gps_info.satellite_info.in_use = nuse
-                self.gps_info.sentences.add(*[self.gps_info._sentence_type._gpgsa])
-            if edited_data._gprmc:
-                rmc = edited_data._gprmc
+                self.gps_info.sentences.add(*[self.gps_info._sentence_type.GPGSA])
+            if edited_data.GPRMC:
+                rmc = edited_data.GPRMC
                 self.gps_info.status = rmc[2]
                 latitude = self.nmea2dd(*[parse_float(*[rmc[3]])])
                 self.gps_info.latitude = latitude if rmc[4] == 'N' else -latitude
                 longitude = self.nmea2dd(*[parse_float(*[rmc[5]])])
                 self.gps_info.longitude = longitude if rmc[6] == 'E' else -longitude
                 NMEA_TUD_KNOTS = 1.852
-                self.gps_info.speed = parse_float(*[rmc[7]]) * _nmea__tud__knots
+                self.gps_info.speed = parse_float(*[rmc[7]]) * NMEA_TUD_KNOTS
                 self.gps_info.direction = rmc[8]
-                self.gps_info.sentences.add(*[self.gps_info._sentence_type._gprmc])
-            if edited_data._gpvtg:
-                vtg = edited_data._gpvtg
+                self.gps_info.sentences.add(*[self.gps_info._sentence_type.GPRMC])
+            if edited_data.GPVTG:
+                vtg = edited_data.GPVTG
                 self.gps_info.direction = parse_float(*[vtg[1]])
                 self.gps_info.declination = parse_float(*[vtg[3]])
                 self.gps_info.speed = parse_float(*[vtg[7]])
-                self.gps_info.sentences.add(*[self.gps_info._sentence_type._gpvtg])
-            if edited_data._gpzda:
+                self.gps_info.sentences.add(*[self.gps_info._sentence_type.GPVTG])
+            if edited_data.GPZDA:
                 self.gps_info.utc = edited_data.timestamp
-                self.gps_info.sentences.add(*[self.gps_info._sentence_type._gpzda])
+                self.gps_info.sentences.add(*[self.gps_info._sentence_type.GPZDA])
         return self.gps_info
 
     def latitude(self):
@@ -203,13 +207,13 @@ class _gysfdmaxb:
         d = _math.floor(*[val / 100])
         m = _math.floor(*[val / 100.0 - d * 100.0])
         s = val / 100.0 - d * 100.0 - m * 60
-        return d + '°' + m + "'" + s.to_fixed(*[1]) + '"'
+        return str(str(str(d) + '°' + m) + "'" + s.to_fixed(*[1])) + '"'
 
     def nmea2dm(self, val):
         val = parse_float(*[val])
         d = _math.floor(*[val / 100.0])
         m = val / 100.0 - d * 100.0
-        return d + '°' + m.to_fixed(*[4]) + "'"
+        return str(str(d) + '°' + m.to_fixed(*[4])) + "'"
 
     def nmea2dd(self, val):
         val = parse_float(*[val])

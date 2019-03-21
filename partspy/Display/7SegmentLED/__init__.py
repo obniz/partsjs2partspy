@@ -32,7 +32,8 @@ class _7_segment_led:
         self.ios.push(*[get_io(*[self.params.f])])
         self.ios.push(*[get_io(*[self.params.g])])
         self.is_cathode_common = False if self.params.common_type == 'anode' else True
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.ios.length, 1):
+            self.ios[i].output(*[False if self.is_cathode_common else True])
         if is_valid_io(*[self.params.dp]):
             self.dp = get_io(*[self.params.dp])
             self.dp.output(*[False])
@@ -44,12 +45,22 @@ class _7_segment_led:
         if type(data) == 'number':
             data = parse_int(*[data])
             data = data % 10
-            # TODO: failed to generate FOR statement
+            for i in range(0, 7, 1):
+                if self.ios[i]:
+                    val = True if self.digits[data] and 1 << i else False
+                    if not self.is_cathode_common:
+                        val = not val
+                    self.ios[i].output(*[val])
             self.on()
 
     def print_raw(self, data):
         if type(data) == 'number':
-            # TODO: failed to generate FOR statement
+            for i in range(0, 7, 1):
+                if self.ios[i]:
+                    val = True if data and 1 << i else False
+                    if not self.is_cathode_common:
+                        val = not val
+                    self.ios[i].output(*[val])
             self.on()
 
     def dp_state(self, show):

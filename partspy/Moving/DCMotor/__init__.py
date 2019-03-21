@@ -38,9 +38,9 @@ class _dcmotor:
                 return
             self.status.direction = True
         else:
-            if self.status.direction == True:
+            if self.status.direction == False:
                 return
-            self.status.direction = True
+            self.status.direction = False
         power = self.power()
         self.power(*[0])
         self.power(*[power])
@@ -57,5 +57,5 @@ class _dcmotor:
             self.pwm1.duty(*[power])
             self.pwm2.duty(*[0])
         else:
-            self.pwm1.duty(*[power])
-            self.pwm2.duty(*[0])
+            self.pwm1.duty(*[0])
+            self.pwm2.duty(*[power])

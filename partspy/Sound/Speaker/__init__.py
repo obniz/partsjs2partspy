@@ -21,8 +21,7 @@ class _speaker:
             self.pwm.freq(*[freq])
             self.pwm.pulse(*[1 / freq / 2 * 1000])
         else:
-            self.pwm.freq(*[freq])
-            self.pwm.pulse(*[1 / freq / 2 * 1000])
+            self.pwm.pulse(*[0])
 
     def stop(self):
         self.play(*[0])

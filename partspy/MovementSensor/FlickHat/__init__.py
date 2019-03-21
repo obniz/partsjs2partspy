@@ -76,7 +76,7 @@ class _flick_hat:
             msgID = data[3]
             if size != 0xff and size > 0:
                 if self.debugprint or self.obniz.debugprint:
-                    console.log(*['flickHat: ' + data.slice(*[0, size]).map(*[# TODO: ArrowFunctionExpression was here])])
+                    console.log(*['flickHat: ' + str(data.slice(*[0, size]).map(*[# TODO: ArrowFunctionExpression was here]))])
                 configmask = None
                 sysinfo = None
                 gesture = None
@@ -145,7 +145,7 @@ class _flick_hat:
                     status_info = {'msg_id': data[4], 'max_cmd_size': data[5], 'error': data[6] or data[7] << 8}
                     self.status_info = status_info
                     if self.debugprint or self.obniz.debugprint:
-                        console.log(*[flickHat: system status: {msgId: status_info.msg_id, maxCmdSize: status_info.max_cmd_size, error: status_info.error}])
+                        console.log(*["flickHat: system status: {msgId: " + status_info.msg_id + ", maxCmdSize: " + status_info.max_cmd_size + ", error: " + status_info.error + "}"])
                 elif msg_id==0x83:
                     fw_info = {'fw_valid': data[4] == 0xaa, 'hw_rev': [data[5], data[6]], 'param_start_addr': data[7] * 128, 'lib_loader_ver': [data[8], data[9]], 'lib_loader_platform': data[10], 'fw_start_addr': data[11] * 128, 'fw_version': self._data_array2string(*[data.slice(*[12, 132])]).split(*['\0'])[0], 'fw_info_received': True}
                     self.fw_info = fw_info
@@ -153,5 +153,5 @@ class _flick_hat:
                         self.onfwinfo(*[fw_info])
                     self.read_size = 26
                 else:
-                    console.error(*[unknown message: 0xmsg_id.to_string(*[16]), data:data.slice(*[0, size]).map(*[# TODO: ArrowFunctionExpression was here])])
+                    console.error(*["unknown message: 0x" + msg_id.to_string(*[16]) + ", data:" + data.slice(*[0, size]).map(*[# TODO: ArrowFunctionExpression was here]) + ""])
             self.io_ts.pull(*['3v'])

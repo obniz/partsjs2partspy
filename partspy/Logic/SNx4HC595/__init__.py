@@ -47,20 +47,18 @@ class _snx4_hc595:
         if type(num) == 'number' and self._io_num != num:
             self._io_num = num
             self.io = []
-            # TODO: failed to generate FOR statement
+            for i in range(0, num, 1):
+                self.io.push(*[_snx4_hc595__io(*[self, i])])
             self.flush()
         else:
-            self._io_num = num
-            self.io = []
-            # TODO: failed to generate FOR statement
-            self.flush()
+            raise Exception('io num should be a number')
 
     def is_valid_io(self, io):
         return type(io) == 'number' and io >= 0 and io < self._io_num
 
     def get_io(self, io):
         if not self.is_valid_io(*[io]):
-            raise Exception('io ' + io + ' is not valid io')
+            raise Exception(str('io ' + str(io)) + ' is not valid io')
         return self.io[io]
 
     def output(self, id, value):
@@ -85,5 +83,8 @@ class _snx4_hc595:
 
     def flush(self):
         self.io_rclk.output(*[False])
-        # TODO: failed to generate FOR statement
+        for i in range(self.io.length - 1, 0 - 1, -1):
+            self.io_ser.output(*[self.io[i].value])
+            self.io_srclk.output(*[True])
+            self.io_srclk.output(*[False])
         self.io_rclk.output(*[True])

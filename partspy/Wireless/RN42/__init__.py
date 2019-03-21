@@ -1,4 +1,4 @@
-class _rn42:
+class RN42:
     def __init__(self):
         self.keys = ['tx', 'rx', 'gnd']
         self.required_keys = ['tx', 'rx']
@@ -19,7 +19,7 @@ class _rn42:
         self.uart.send(*[data])
 
     def send_command(self, data):
-        self.uart.send(*[data + '\n'])
+        self.uart.send(*[str(data) + '\n'])
         self.obniz.wait(*[100])
 
     def enter_command_mode(self):
@@ -54,19 +54,19 @@ class _rn42:
             val = mode
         elif type(mode) == 'string':
             modes = ['slave', 'master', 'trigger', 'auto-connect-master', 'auto-connect-dtr', 'auto-connect-any', 'pairing']
-            # TODO: failed to generate FOR statement
-        else:
-            modes = ['slave', 'master', 'trigger', 'auto-connect-master', 'auto-connect-dtr', 'auto-connect-any', 'pairing']
-            # TODO: failed to generate FOR statement
+            for i in range(0, modes.length, 1):
+                if modes[i] == mode:
+                    val = i
+                    break
         if val == -1:
             return
-        self.send_command(*['SM,' + val])
+        self.send_command(*['SM,' + str(val)])
 
     def config_display_name(self, name):
-        self.send_command(*['SN,' + name])
+        self.send_command(*['SN,' + str(name)])
 
     def config__hidflag(self, flag):
-        self.send_command(*['SH,' + flag])
+        self.send_command(*['SH,' + str(flag)])
 
     def config_profile(self, mode):
         val = -1
@@ -74,13 +74,13 @@ class _rn42:
             val = mode
         elif type(mode) == 'string':
             modes = ['SPP', 'DUN-DCE', 'DUN-DTE', 'MDM-SPP', 'SPP-DUN-DCE', 'APL', 'HID']
-            # TODO: failed to generate FOR statement
-        else:
-            modes = ['SPP', 'DUN-DCE', 'DUN-DTE', 'MDM-SPP', 'SPP-DUN-DCE', 'APL', 'HID']
-            # TODO: failed to generate FOR statement
+            for i in range(0, modes.length, 1):
+                if modes[i] == mode:
+                    val = i
+                    break
         if val == -1:
             return
-        self.send_command(*['S~,' + val])
+        self.send_command(*['S~,' + str(val)])
 
     def config_revert_localecho(self):
         self.send_command(*['+'])
@@ -91,13 +91,13 @@ class _rn42:
             val = mode
         elif type(mode) == 'string':
             modes = ['open', 'ssp-keyboard', 'just-work', 'pincode']
-            # TODO: failed to generate FOR statement
-        else:
-            modes = ['open', 'ssp-keyboard', 'just-work', 'pincode']
-            # TODO: failed to generate FOR statement
+            for i in range(0, modes.length, 1):
+                if modes[i] == mode:
+                    val = i
+                    break
         if val == -1:
             return
-        self.send_command(*['SA,' + val])
+        self.send_command(*['SA,' + str(val)])
 
     def config_power(self, dbm):
         val = '0010'
@@ -115,9 +115,7 @@ class _rn42:
             val = 'FFF8'
         elif -8 > dbm:
             val = 'FFF4'
-        else:
-            val = 'FFF4'
-        self.send_command(*['SY,' + val])
+        self.send_command(*['SY,' + str(val)])
 
     def config_get_setting(self):
         self.send_command(*['D'])

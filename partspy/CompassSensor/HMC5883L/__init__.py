@@ -1,6 +1,6 @@
 import asyncio
 
-class _hmc5883_l:
+class HMC5883L:
     def __init__(self):
         self.keys = ['gnd', 'sda', 'scl', 'i2c']
         self.address = }
@@ -30,5 +30,9 @@ class _hmc5883_l:
         readed = await self.i2c.read_wait(*[self.address.device, 2 * 3])
         obj = }
         keys = ['x', 'y', 'z']
-        # TODO: failed to generate FOR statement
+        for i in range(0, 3, 1):
+            val = readed[i * 2] << 8 or readed[i * 2 + 1]
+            if val and 0x8000:
+                val = val - 65536
+            obj[keys[i]] = val
         return obj

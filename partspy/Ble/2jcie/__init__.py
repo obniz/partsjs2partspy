@@ -1,6 +1,6 @@
 import asyncio
 
-class _omron_2_jcie:
+class OMRON_2JCIE:
     def __init__(self):
         self.keys = []
         self.required_keys = []
@@ -19,7 +19,7 @@ class _omron_2_jcie:
         return self.periperal
 
     def omron_uuid(self, uuid):
-        return 0C4Cuuid-7700-46F4-AA96D5E974E32A54
+        return "0C4C" + uuid + "-7700-46F4-AA96D5E974E32A54"
 
     async def connect_wait(self):
         if not self.periperal:
@@ -35,14 +35,16 @@ class _omron_2_jcie:
 
     def signed_number_from_binary(self, data):
         val = data[data.length - 1] and 0x7f
-        # TODO: failed to generate FOR statement
+        for i in range(data.length - 2, 0 - 1, -1):
+            val = val * 256 + data[i]
         if data[data.length - 1] and 0x80 != 0:
             val = val - _math.pow(*[2, data.length * 8 - 1])
         return val
 
     def unsigned_number_from_binary(self, data):
         val = data[data.length - 1]
-        # TODO: failed to generate FOR statement
+        for i in range(data.length - 2, 0 - 1, -1):
+            val = val * 256 + data[i]
         return val
 
     async def get_latest_data(self):

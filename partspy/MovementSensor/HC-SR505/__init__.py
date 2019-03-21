@@ -1,4 +1,4 @@
-class _hcsr505:
+class HCSR505:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'signal']
         self.required_keys = ['signal']

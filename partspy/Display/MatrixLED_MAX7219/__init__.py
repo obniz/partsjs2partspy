@@ -42,7 +42,8 @@ class _matrix_led__max7219:
         self.passing_commands()
 
     def passing_commands(self):
-        # TODO: failed to generate FOR statement
+        for i in range(8, self.width, 8):
+            self.write(*[[0x00, 0x00]])
 
     def brightness(self, val):
         self.write(*[[0x0a, val]])
@@ -50,7 +51,11 @@ class _matrix_led__max7219:
 
     def preparevram(self, width, height):
         self.vram = []
-        # TODO: failed to generate FOR statement
+        for i in range(0, height, 1):
+            dots = [0] * width / 8
+            for ii in range(0, dots.length, 1):
+                dots[ii] = 0x00
+            self.vram.push(*[dots])
 
     def write(self, data):
         self.cs.output(*[False])
@@ -58,13 +63,33 @@ class _matrix_led__max7219:
         self.cs.output(*[True])
 
     def write_vram(self):
-        # TODO: failed to generate FOR statement
+        for line_num in range(0, self.height, 1):
+            addr = line_num + 1
+            line = self.vram[line_num]
+            data = []
+            for col in range(0, line.length, 1):
+                data.push(*[addr])
+                data.push(*[line[col]])
+            self.write(*[data])
 
     def clear(self):
-        # TODO: failed to generate FOR statement
+        for line_num in range(0, self.height, 1):
+            line = self.vram[line_num]
+            for col in range(0, line.length, 1):
+                self.vram[line_num][col] = 0x00
+            self.write_vram()
 
     def draw(self, ctx):
         imageData = ctx.get_image_data(*[0, 0, self.width, self.height])
         data = image_data.data
-        # TODO: failed to generate FOR statement
+        for i in range(0, data.length, 4):
+            brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]
+            index = parse_int(*[i / 4])
+            line = parse_int(*[index / self.width])
+            col = parse_int(*[index - line * self.width / 8])
+            bits = parse_int(*[index - line * self.width]) % 8
+            if bits == 0:
+                self.vram[line][col] = 0x00
+            if brightness > 0x7f:
+                self.vram[line][col] |= 0x80 >> bits
         self.write_vram()

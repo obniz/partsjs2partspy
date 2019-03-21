@@ -2,6 +2,7 @@ import os
 import re
 import json
 import pathlib
+import argparse
 
 from prestring.python import PythonModule
 
@@ -9,7 +10,13 @@ from prestring.python import PythonModule
 # TODO: キーワード引数(デフォルト引数)はJS側を編集すべき？ -> はい
 # TODO: 文字列連結はJS側を編集すべき？
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--file", help="set specific file[directory] name", type=str)
+args = parser.parse_args()
+
 def snake(text):
+    if text.isupper():
+        return text
     return re.sub("([A-Z])+",lambda x:"_" + x.group().lower(), text)
 
 def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
@@ -88,26 +95,26 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
                     get_statement(line, module)
             else:
                 get_statement(stt["consequent"], module)
-        consequent = stt
-        alternate = stt["alternate"]
-        if not alternate:
+        if not stt["alternate"]:
             return
-        while alternate is not None and alternate["type"] == "IfStatement":
-            with module.elif_(get_expression(alternate["test"])):
-                if "body" in alternate["consequent"]:
-                    for line in alternate["consequent"]["body"]:
+        consequent = stt["alternate"]
+        while consequent and consequent["type"] == "IfStatement":
+            with module.elif_(get_expression(consequent["test"])):
+                if "body" in consequent["consequent"]:
+                    for line in consequent["consequent"]["body"]:
                         get_statement(line, module)
                 else:
-                    get_statement(alternate["consequent"], module)
-            consequent = alternate
-            alternate = alternate["alternate"]
-        
-        with module.else_():
-            if "body" in consequent["consequent"]:
-                for line in consequent["consequent"]["body"]:
-                    get_statement(line, module)
-            else:
-                get_statement(consequent["consequent"], module)
+                    get_statement(consequent["consequent"], module)
+            consequent = consequent["alternate"]
+        if consequent:
+            with module.else_():
+                if "body" in consequent:
+                    for line in consequent["body"]:
+                        get_statement(line, module)
+                    return
+                else:
+                    get_statement(consequent, module)
+                    return
         return
     
     if stt["type"] == "SwitchStatement":
@@ -159,20 +166,53 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
     if stt["type"] == "ForStatement":
         # TODO:
         try:
-            i = stt["init"]["declarations"][0]["id"]["name"]
-            if (get_expression(stt["init"]["declarations"][0]["init"]) == "0" and
-                ("length" in stt["test"]["left"] or "length" in stt["test"]["right"]) and
-                stt["update"]["operator"] == "++"):
-                with module.for_("_i", iterator=iterator):
-                    for line in stt["body"]["body"]:
-                        get_statement(line,
-                            module,
-                            replace_from=iterator + "[" + i + "]",
-                            replace_to="_i")
-                return
+            # i = stt["init"]["declarations"][0]["id"]["name"]
+            # if (get_expression(stt["init"]["declarations"][0]["init"]) == "0" and
+            #     ("length" in stt["test"]["left"] or "length" in stt["test"]["right"]) and
+            #     stt["update"]["operator"] == "++"):
+            #     with module.for_("_i", iterator=iterator):
+            #         for line in stt["body"]["body"]:
+            #             get_statement(line,
+            #                 module,
+            #                 replace_from=iterator + "[" + i + "]",
+            #                 replace_to="_i")
+            #     return
+            # else:
+            #     module.stmt("# TODO: failed to generate FOR statement")
+            #     return
+            iterator = get_expression(stt["init"]["declarations"][0]["id"])
+            init = get_expression(stt["init"]["declarations"][0]["init"])
+            if get_expression(stt["test"]["left"]) == iterator:
+                limit = get_expression(stt["test"]["right"])
+                if "<=" in stt["test"]["operator"]:
+                    limit += " + 1"
+                elif ">=" in stt["test"]["operator"]:
+                    limit += " - 1"
+            elif get_expression(stt["test"]["right"]) == iterator:
+                limit = get_expression(stt["test"]["left"])
+                if "<=" in stt["test"]["operator"]:
+                    limit += " + 1"
+                elif ">=" in stt["test"]["operator"]:
+                    limit += " - 1"
             else:
-                module.stmt("# TODO: failed to generate FOR statement")
+                module.stmt("# TODO: failed to generate FOR statement(test doesnt include iterator)")
                 return
+            if stt["update"]["type"] == "AssignmentExpression":
+                # if get_expression(stt["update"]["left"]) == iterator:
+                step = get_expression(stt["update"]["right"])
+            elif stt["update"]["type"] == "UpdateExpression":
+                step = 1
+            else:
+                module.stmt("# TODO: failed to generate FOR statement(unexpected update)")
+                return
+
+            if "-" in stt["update"]["operator"]:
+                step *= -1
+            with module.for_(iterator, iterator="range({0}, {1}, {2})".format(init, limit, step)):
+                for line in stt["body"]["body"]:
+                    get_statement(line, module)
+                return
+
         except:
             module.stmt("# TODO: failed to generate FOR statement")
             return
@@ -282,6 +322,22 @@ def get_expression(exp):
             get_expression(exp["right"]))
 
     if exp["type"] == "BinaryExpression":
+        if ("+" in exp["operator"] and
+            ("Literal" in exp["left"]["type"] and type(exp["left"]["value"]) is str)
+            ):
+            return (get_expression(exp["left"]) +
+            " " +
+            get_operator(exp["operator"]) +
+            " str(" +
+            get_expression(exp["right"]) + ")")
+        elif ("+" in exp["operator"] and
+            ("Literal" in exp["right"]["type"] and type(exp["right"]["value"]) is str)
+            ):
+            return ("str(" +get_expression(exp["left"]) +
+            ") " +
+            get_operator(exp["operator"]) +
+            " " +
+            get_expression(exp["right"]))
         return (get_expression(exp["left"]) +
             " " +
             get_operator(exp["operator"]) +
@@ -384,14 +440,26 @@ def get_expression(exp):
             if exp["arguments"]:
                 return "[0] * " + get_expression(exp["arguments"][0])
             return "[]"
-        if exp["callee"]["name"] == "Set":
+        elif exp["callee"]["name"] == "Set":
             if exp["arguments"]:
                 return get_expression(exp["arguments"][0])
             return "[]"
-        if exp["callee"]["name"] == "Promise":
+        elif exp["callee"]["name"] == "Promise":
             return "await" + get_expression(exp["arguments"][0])
-        if exp["callee"]["name"] == "Date":
+        elif exp["callee"]["name"] == "Date":
             return "datetime.datetime.now()"
+        else:
+            if not exp["arguments"]:
+                return (get_expression(exp["callee"]) + "()")
+            listr = "["
+            for arg in exp["arguments"]:
+                listr += get_expression(arg) + ", "
+            listr = listr[:-2] + "]"
+            return (get_expression(exp["callee"]) + 
+                    "(*" +
+                    listr +
+                    ")")
+
     
     if exp["type"] == "SpreadElement":
         # スプレッド演算子はPythonには存在しない
@@ -409,9 +477,9 @@ def get_expression(exp):
         for i, quas in enumerate(quasis):
             if quas["tail"]:
                 template += quas["value"]["raw"]
-                return template
+                return '"' + template + '"'
             template += quas["value"]["raw"]
-            template += exps[i]
+            template += '" + ' + exps[i] + ' + "'
 
     if exp["type"] == "UpdateExpression":
         # forの更新式はPythonでは必要ない
@@ -437,6 +505,8 @@ if __name__ == "__main__":
 
     file_path = pathlib.Path(__file__).parent
     part_jsons = list(file_path.glob("**/index.json"))
+    if args.file:
+        part_jsons = [part for part in part_jsons if args.file in str(part)]
     for num, part_json in enumerate(part_jsons):
         m = PythonModule()
         print("===start to generate " + str(part_json.parent) + "===")

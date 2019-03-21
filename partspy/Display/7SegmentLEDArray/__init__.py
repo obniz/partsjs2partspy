@@ -2,7 +2,7 @@ import datetime
 
 class _7_segment_ledarray:
     def __init__(self):
-        self.identifier = '' + datetime.datetime.now().get_time()
+        self.identifier = '' + str(datetime.datetime.now().get_time())
         self.keys = ['segments']
         self.required_keys = self.keys
 
@@ -19,7 +19,8 @@ class _7_segment_ledarray:
             data = parse_int(*[data])
             print = # TODO: ArrowFunctionExpression was here
             animations = []
-            # TODO: failed to generate FOR statement
+            for i in range(0, self.segments.length, 1):
+                animations.push(*[{'duration': 3, 'state': print}])
             self.obniz.io.animation(*[self.identifier, 'loop', animations])
 
     def on(self):
@@ -27,4 +28,5 @@ class _7_segment_ledarray:
 
     def off(self):
         self.obniz.io.animation(*[self.identifier, 'pause'])
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.segments.length, 1):
+            self.segments[i].off()

@@ -1,6 +1,6 @@
 import asyncio
 
-class _gp2_y0_a21_yk0_f:
+class GP2Y0A21YK0F:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'signal']
         self.required_keys = ['signal']
@@ -28,7 +28,8 @@ class _gp2_y0_a21_yk0_f:
         if self._unit == 'mm':
             distance = parse_int(*[distance * 10]) / 10
         else:
-            distance = parse_int(*[distance * 10]) / 10
+            distance *= 0.0393701
+            distance = parse_int(*[distance * 1000]) / 1000
         return distance
 
     def get_wait(self):
@@ -40,4 +41,4 @@ class _gp2_y0_a21_yk0_f:
         elif unit == 'inch':
             self._unit = 'inch'
         else:
-            self._unit = 'inch'
+            raise Exception('unknown unit ' + str(unit))

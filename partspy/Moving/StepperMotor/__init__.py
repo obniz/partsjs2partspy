@@ -23,9 +23,7 @@ class _stepper_motor:
             self.common.output(*[True])
             self.type = 'unipolar'
         else:
-            self.common = obniz.get_io(*[self.params.common])
-            self.common.output(*[True])
-            self.type = 'unipolar'
+            self.type = 'bipolar'
         self.ios = []
         self.ios.push(*[obniz.get_io(*[self.params.a])])
         self.ios.push(*[obniz.get_io(*[self.params.b])])
@@ -43,16 +41,23 @@ class _stepper_motor:
         if current_phase < 0:
             current_phase = instruction_length - current_phase * -1
         if step_count > 0:
-            # TODO: failed to generate FOR statement
+            for i in range(0, instructions.length, 1):
+                if  >= instruction_length:
+                    current_phase = 0
+                array.push(*[instructions[currentPhase]])
         else:
-            # TODO: failed to generate FOR statement
+            for i in range(0, instructions.length, 1):
+                if  < 0:
+                    current_phase = instruction_length - 1
+                array.push(*[instructions[currentPhase]])
         msec = 1000 / self.frequency
         msec = parse_int(*[msec])
         if msec < 1:
             msec = 1
         state = # TODO: ArrowFunctionExpression was here
         states = []
-        # TODO: failed to generate FOR statement
+        for i in range(0, instruction_length, 1):
+            states.push(*[{'duration': msec, 'state': state}])
         await self.obniz.io.repeat_wait(*[states, step_count_abs])
         self.current_step += step_count
 
@@ -66,17 +71,19 @@ class _stepper_motor:
         currentPhase = self.current_step % instruction_length
         if current_phase < 0:
             current_phase = instruction_length - current_phase * -1
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.ios.length, 1):
+            self.ios[i].output(*[instructions[currentPhase][i]])
         await self.obniz.ping_wait()
 
     async def free_wait(self):
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.ios.length, 1):
+            self.ios[i].output(*[True])
         await self.obniz.ping_wait()
 
     def step_type(self, step_type):
         newType = self._step_instructions[stepType]
         if not new_type:
-            raise Exception('unknown step type ' + step_type)
+            raise Exception('unknown step type ' + str(step_type))
         self._step_type = step_type
 
     def speed(self, step_per_sec):

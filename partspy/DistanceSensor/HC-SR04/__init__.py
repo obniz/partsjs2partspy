@@ -1,6 +1,6 @@
 import asyncio
 
-class _hcsr04:
+class HCSR04:
     def __init__(self):
         self.keys = ['vcc', 'trigger', 'echo', 'gnd']
         self.required_keys = ['vcc', 'trigger', 'echo']
@@ -35,4 +35,4 @@ class _hcsr04:
         elif unit == 'inch':
             self._unit = 'inch'
         else:
-            self._unit = 'inch'
+            raise Exception('HCSR04: unknown unit ' + str(unit))

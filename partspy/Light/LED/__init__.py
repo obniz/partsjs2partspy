@@ -1,4 +1,4 @@
-class _led:
+class LED:
     def __init__(self):
         self.keys = ['anode', 'cathode']
         self.required_keys = ['anode']
@@ -20,7 +20,7 @@ class _led:
         if self.params.cathode:
             self.io_cathode = get_io(*[self.params.cathode])
             self.io_cathode.output(*[False])
-        self.animation_name = 'Led-' + self.params.anode
+        self.animation_name = 'Led-' + str(self.params.anode)
 
     def on(self):
         self.end_blink()
@@ -34,7 +34,7 @@ class _led:
         if value:
             self.on()
         else:
-            self.on()
+            self.off()
 
     def end_blink(self):
         self.obniz.io.animation(*[self.animation_name, 'pause'])

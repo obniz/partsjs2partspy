@@ -25,7 +25,7 @@ class _xbee:
         if self.is_at_mode == False:
             self.uart.send(*[text])
         else:
-            self.uart.send(*[text])
+            self.obniz.error(*['XBee is AT Command mode now. Wait for finish config.'])
 
     def on_at_results_recieve(self, data, text):
         if not self.is_at_mode:
@@ -41,20 +41,21 @@ class _xbee:
                 return
             next()
         elif text == 'ERROR\r':
-            self.obniz.error(*['XBee config error : ' + self.current_command])
+            self.obniz.error(*['XBee config error : ' + str(self.current_command)])
         else:
-            self.obniz.error(*['XBee config error : ' + self.current_command])
+            console.log(*['XBEE : no catch message', data])
+            next()
 
     def add_command(self, command, value):
-        str = command + ' ' + value if value else ''
+        str = command + ' ' + str(value) if value else ''
         self.commands.push(*[str])
         if self.is_at_mode == True and self.current_command == null:
             self.send_command()
 
     def send_command(self):
         if self.is_at_mode == True and self.current_command == null and self.commands.length > 0:
-            self.current_command = 'AT' + self.commands.shift()
-            self.uart.send(*[self.current_command + '\r'])
+            self.current_command = 'AT' + str(self.commands.shift())
+            self.uart.send(*[str(self.current_command) + '\r'])
 
     def enter_at_mode(self):
         if self.current_command != null:

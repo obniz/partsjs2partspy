@@ -33,10 +33,13 @@ class _7_segment_led__max7219:
         self.obniz.wait(*[10])
 
     def clear(self, disp):
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.digits, 1):
+            self.write_one_disp(*[disp, [i + 1, 0x0f]])
 
     def clear_all(self):
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.num_of_disp, 1):
+            for j in range(0, self.digits, 1):
+                self.write_all_disp(*[[j + 1, 0x0f]])
 
     def test(self):
         self.write_all_disp(*[[0x0f, 0x00]])
@@ -48,13 +51,16 @@ class _7_segment_led__max7219:
         self.write_all_disp(*[[0x0a, val]])
 
     def write_all_disp(self, data):
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.num_of_disp, 1):
+            self.write_one_disp(*[i, data])
 
     def write_one_disp(self, disp, data):
         self.cs.output(*[False])
-        # TODO: failed to generate FOR statement
+        for i in range(0, disp, 1):
+            self.spi.write(*[[0x00, 0x00]])
         self.spi.write(*[data])
-        # TODO: failed to generate FOR statement
+        for i in range(0, self.num_of_disp - disp + 1, 1):
+            self.spi.write(*[[0x00, 0x00]])
         self.cs.output(*[True])
 
     def set_number(self, disp, digit, number, dp):
@@ -66,7 +72,7 @@ class _7_segment_led__max7219:
         if dp == True:
             dpreg = 0x80
         else:
-            dpreg = 0x80
+            dpreg = 0x00
         if decimal >= 0 and decimal <= 9:
             return decimal or dpreg
         elif decimal == '-' or decimal == 10:

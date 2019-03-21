@@ -1,4 +1,4 @@
-class _ws2812:
+class WS2812:
     def __init__(self):
         self.keys = ['din', 'vcc', 'gnd']
         self.required_keys = ['din']
@@ -22,55 +22,69 @@ class _ws2812:
         zero = 0x8
         one = 0xc
         ret = []
-        # TODO: failed to generate FOR statement
+        for i in range(0, 8, 2):
+            byte = 0
+            if val and 0x80 >> i:
+                byte = one << 4
+            else:
+                byte = zero << 4
+            if val and 0x80 >> i + 1:
+                byte |= one
+            else:
+                byte |= zero
+            ret.push(*[byte])
         return ret
 
     @staticmethod
     def _generate_color(r, g, b):
-        array = _ws2812._generate_from_byte(*[g])
-        array = array.concat(*[_ws2812._generate_from_byte(*[r])])
-        array = array.concat(*[_ws2812._generate_from_byte(*[b])])
+        array = WS2812._generate_from_byte(*[g])
+        array = array.concat(*[WS2812._generate_from_byte(*[r])])
+        array = array.concat(*[WS2812._generate_from_byte(*[b])])
         return array
 
     @staticmethod
     def _generate_hsv_color(h, s, v):
         C = v * s
         Hp = h / 60
-        X = _c * 1 - _math.abs(*[_hp % 2 - 1])
+        X = C * 1 - _math.abs(*[_hp % 2 - 1])
         R = None
         G = None
         B = None
         if 0 <= _hp and _hp < 1:
-            [_r, _g, _b] = [_c, _x, 0]
+            [R, G, B] = [C, X, 0]
         if 1 <= _hp and _hp < 2:
-            [_r, _g, _b] = [_x, _c, 0]
+            [R, G, B] = [X, C, 0]
         if 2 <= _hp and _hp < 3:
-            [_r, _g, _b] = [0, _c, _x]
+            [R, G, B] = [0, C, X]
         if 3 <= _hp and _hp < 4:
-            [_r, _g, _b] = [0, _x, _c]
+            [R, G, B] = [0, X, C]
         if 4 <= _hp and _hp < 5:
-            [_r, _g, _b] = [_x, 0, _c]
+            [R, G, B] = [X, 0, C]
         if 5 <= _hp and _hp < 6:
-            [_r, _g, _b] = [_c, 0, _x]
-        m = v - _c
-        [_r, _g, _b] = [_r + m, _g + m, _b + m]
-        _r = _math.floor(*[_r * 255])
-        _g = _math.floor(*[_g * 255])
-        _b = _math.floor(*[_b * 255])
-        return _ws2812._generate_color(*[_r, _g, _b])
+            [R, G, B] = [C, 0, X]
+        m = v - C
+        [R, G, B] = [R + m, G + m, B + m]
+        R = _math.floor(*[R * 255])
+        G = _math.floor(*[G * 255])
+        B = _math.floor(*[B * 255])
+        return WS2812._generate_color(*[R, G, B])
 
     def rgb(self, r, g, b):
-        self.spi.write(*[_ws2812._generate_color(*[r, g, b])])
+        self.spi.write(*[WS2812._generate_color(*[r, g, b])])
 
     def hsv(self, h, s, v):
-        self.spi.write(*[_ws2812._generate_hsv_color(*[h, s, v])])
+        self.spi.write(*[WS2812._generate_hsv_color(*[h, s, v])])
 
     def rgbs(self, array):
         bytes = []
-        # TODO: failed to generate FOR statement
+        for i in range(0, array.length, 1):
+            oneArray = array[i]
+            bytes = bytes.concat(*[WS2812._generate_color(*[one_array[0], one_array[1], one_array[2]])])
         self.spi.write(*[bytes])
 
     def hsvs(self, array):
         bytes = []
-        # TODO: failed to generate FOR statement
+        for i in range(0, array.length, 1):
+            oneArray = array[i]
+            bytes = bytes.concat(*[WS2812._generate_hsv_color(*[one_array[0], one_array[1], one_array[2]])])
         self.spi.write(*[bytes])

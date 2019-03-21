@@ -1,6 +1,6 @@
 import asyncio
 
-class _fsr40_x:
+class FSR40X:
     def __init__(self):
         self.keys = ['pin0', 'pin1']
         self.required_keys = ['pin0', 'pin1']

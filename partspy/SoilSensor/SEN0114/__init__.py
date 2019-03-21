@@ -1,6 +1,6 @@
 import asyncio
 
-class _sen0114:
+class SEN0114:
     def __init__(self):
         self.keys = ['vcc', 'output', 'gnd']
         self.required_keys = ['output']

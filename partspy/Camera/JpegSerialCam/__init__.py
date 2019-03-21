@@ -34,7 +34,13 @@ class _jpeg_serial_cam:
 
     def _seek_tail(self, search, src):
         f = 0
-        # TODO: failed to generate FOR statement
+        for i in range(0, src.length, 1):
+            if src[i] == search[f]:
+
+                if f == search.length:
+                    return i + 1
+            else:
+                f = 0
         return -1
 
     def array_to_base64(self, array):
@@ -62,7 +68,7 @@ class _jpeg_serial_cam:
         elif resolution == '160x120':
             val = 0x22
         else:
-            val = 0x22
+            raise Exception('unsupported size')
         self.uart.send(*[[0x56, 0x00, 0x31, 0x05, 0x04, 0x01, 0x00, 0x19, val]])
         await self._drain_until(*[self.uart, [0x76, 0x00, 0x31, 0x00]])
         await self.resetwait()
@@ -105,12 +111,12 @@ class _jpeg_serial_cam:
             readed = uart.read_bytes()
             recv = recv.concat(*[readed])
             if recv.length >= 2:
-                _xx = recv[0]
-                _yy = recv[1]
+                XX = recv[0]
+                YY = recv[1]
                 break
             await self.obniz.wait(*[1000])
-        databytes = _xx * 256 + _yy
-        uart.send(*[[0x56, 0x00, 0x32, 0x0c, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, _xx, _yy, 0x00, 0xff]])
+        databytes = XX * 256 + YY
+        uart.send(*[[0x56, 0x00, 0x32, 0x0c, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, XX, YY, 0x00, 0xff]])
         recv = await self._drain_until(*[uart, [0x76, 0x00, 0x32, 0x00, 0x00]])
         while True:
             readed = uart.read_bytes()

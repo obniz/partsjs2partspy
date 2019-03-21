@@ -36,7 +36,11 @@ class _sharp_memory_tft:
 
     def _reverse_bits(self, data):
         revData = 0
-        # TODO: failed to generate FOR statement
+        for i in range(0, 8, 1):
+            rev_data += data and 0x01
+            data >>= 1
+            if i < 7:
+                rev_data <<= 1
         return rev_data
 
     def send_lsb(self, data):
@@ -57,7 +61,18 @@ class _sharp_memory_tft:
         oldline = currentline = 1
         array[] = self._reverse_bits(*[currentline])
         self.io_cs.output(*[True])
-        # TODO: failed to generate FOR statement
+        for i in range(0, totalbytes, 1):
+            array[] = raw_data[i]
+            currentline = parse_int(*[i + 1 / self.width / 8 + 1, 10])
+            if currentline != oldline:
+                array[] = 0x00
+                if currentline <= self.height:
+                    array[] = self._reverse_bits(*[currentline])
+                oldline = currentline
+            if index >= 1021:
+                self.spi.write(*[array.slice(*[0, index])])
+                array = [0] * 1024
+                index = 0
         if index > 0:
             self.spi.write(*[array.slice(*[0, index])])
         self.spi.write(*[[0x00]])
@@ -71,7 +86,7 @@ class _sharp_memory_tft:
         if self.obniz.is_node:
             raise Exception('MemoryDisplay require node-canvas to draw rich contents. see more detail on docs')
         else:
-            raise Exception('MemoryDisplay require node-canvas to draw rich contents. see more detail on docs')
+            raise Exception('MemoryDisplay cant create canvas element to body')
 
     def _prepared_canvas(self):
         if self._canvas:
@@ -79,7 +94,18 @@ class _sharp_memory_tft:
         if self.obniz.is_node:
             # TODO: failed to TRY statement
         else:
-            # TODO: failed to TRY statement
+            identifier = 'MemoryDispCanvas-' + str(self.obniz.id)
+            canvas = document.get_element_by_id(*[identifier])
+            if not canvas:
+                canvas = document.create_element(*['canvas'])
+                canvas.set_attribute(*['id', identifier])
+                canvas.style.visibility = 'hidden'
+                canvas.width = self.width
+                canvas.height = self.height
+                canvas.style['-webkit-font-smoothing'] = 'none'
+                body = document.get_elements_by_tag_name(*['body'])[0]
+                body.append_child(*[canvas])
+            self._canvas = canvas
         ctx = self._canvas.get_context(*['2d'])
         ctx.fill_style = '#FFF'
         ctx.fill_rect(*[0, 0, self.width, self.height])
@@ -88,7 +114,7 @@ class _sharp_memory_tft:
         self._pos.x = 0
         self._pos.y = 0
         self.font_size = 16
-        ctx.font = self.font_sizepx Arial
+        ctx.font = "" + self.font_size + "px Arial"
         return self._canvas
 
     def _ctx(self):
@@ -103,7 +129,7 @@ class _sharp_memory_tft:
         if type(font) != 'string':
             font = 'Arial'
         self.font_size = size
-        ctx.font = '' + +' ' + size + 'px ' + font
+        ctx.font = str('' + str(+' ') + size) + 'px ' + font
 
     def clear(self):
         ctx = self._ctx()
@@ -116,11 +142,7 @@ class _sharp_memory_tft:
             ctx.stroke_style = '#000'
             self.draw(*[ctx])
         else:
-            ctx.fill_style = '#fff'
-            ctx.fill_rect(*[0, 0, self.width, self.height])
-            ctx.fill_style = '#000'
-            ctx.stroke_style = '#000'
-            self.draw(*[ctx])
+            self.send_clear()
 
     def pos(self, x, y):
         self._ctx()
@@ -137,9 +159,7 @@ class _sharp_memory_tft:
             self.draw(*[ctx])
             self._pos.y += self.font_size
         else:
-            ctx.fill_text(*[text, self._pos.x, self._pos.y + self.font_size])
-            self.draw(*[ctx])
-            self._pos.y += self.font_size
+
 
     def line(self, x_0, y_0, x_1, y_1):
         ctx = self._ctx()
@@ -150,11 +170,7 @@ class _sharp_memory_tft:
             ctx.stroke()
             self.draw(*[ctx])
         else:
-            ctx.begin_path()
-            ctx.move_to(*[x_0, y_0])
-            ctx.line_to(*[x_1, y_1])
-            ctx.stroke()
-            self.draw(*[ctx])
+            self.warn_canvas_availability()
 
     def rect(self, x, y, width, height, must_fill):
         ctx = self._ctx()
@@ -162,40 +178,39 @@ class _sharp_memory_tft:
             if must_fill:
                 ctx.fill_rect(*[x, y, width, height])
             else:
-                ctx.fill_rect(*[x, y, width, height])
+                ctx.stroke_rect(*[x, y, width, height])
             self.draw(*[ctx])
         else:
-            if must_fill:
-                ctx.fill_rect(*[x, y, width, height])
-            else:
-                ctx.fill_rect(*[x, y, width, height])
-            self.draw(*[ctx])
+            self.warn_canvas_availability()
 
     def circle(self, x, y, r, must_fill):
         ctx = self._ctx()
         if ctx:
             ctx.begin_path()
-            ctx.arc(*[x, y, r, 0, _math._pi * 2])
+            ctx.arc(*[x, y, r, 0, _math.PI * 2])
             if must_fill:
                 ctx.fill()
             else:
-                ctx.fill()
+                ctx.stroke()
             self.draw(*[ctx])
         else:
-            ctx.begin_path()
-            ctx.arc(*[x, y, r, 0, _math._pi * 2])
-            if must_fill:
-                ctx.fill()
-            else:
-                ctx.fill()
-            self.draw(*[ctx])
+            self.warn_canvas_availability()
 
     def _draw(self, ctx):
         stride = self.width / 8
         vram = [0] * stride * 64
         imageData = ctx.get_image_data(*[0, 0, self.width, self.height])
         data = image_data.data
-        # TODO: failed to generate FOR statement
+        for i in range(0, data.length, 4):
+            brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]
+            index = parse_int(*[i / 4])
+            line = parse_int(*[index / self.width])
+            col = parse_int(*[index - line * self.width / 8])
+            bits = parse_int(*[index - line * self.width]) % 8
+            if bits == 0:
+                vram[line * stride + col] = 0x00
+            if brightness > 0x73:
+                vram[line * stride + col] |= 0x80 >> bits
         self.raw(*[vram])
 
     def draw(self, ctx):

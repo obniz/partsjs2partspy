@@ -1,4 +1,4 @@
-class _usb:
+class USB:
     def __init__(self):
         self.keys = ['vcc', 'gnd']
         self.required_keys = ['vcc', 'gnd']

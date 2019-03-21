@@ -1,6 +1,6 @@
 import asyncio
 
-class _mq6:
+class MQ6:
     def __init__(self):
         self.keys = ['gnd', 'vcc', 'do', 'ao']
         self.required_keys = []
@@ -32,5 +32,5 @@ class _mq6:
         if seconds > 0:
             seconds *= 1000
         else:
-            seconds *= 1000
+            seconds = 2 * 60 * 1000
         return await# TODO: ArrowFunctionExpression was here

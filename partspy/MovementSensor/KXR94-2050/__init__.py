@@ -1,6 +1,6 @@
 import asyncio
 
-class _kxr94_2050:
+class KXR94_2050:
     def __init__(self):
         self.keys = ['x', 'y', 'z', 'vcc', 'gnd', 'enable', 'self_test']
         self.required_keys = ['x', 'y', 'z']

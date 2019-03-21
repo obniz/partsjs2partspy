@@ -27,15 +27,15 @@ class _sain_smart_tft18_lcd:
         self.spi = self.obniz.get_spi_with_config(*[self.params])
         self.io_dc.output(*[True])
         self.io_cs.output(*[False])
-        self.width = _st7735__tftwidth
-        self.height = _st7735__tftheight
+        self.width = ST7735_TFTWIDTH
+        self.height = ST7735_TFTHEIGHT
         self.write_buffer = []
         self._set_preset_color()
         self.init()
 
     def print_debug(self, v):
         if self.debugprint:
-            console.log(*['SainSmartTFT18LCD: ' + _array.prototype.slice.call(*[arguments]).join(*[''])])
+            console.log(*['SainSmartTFT18LCD: ' + str(_array.prototype.slice.call(*[arguments]).join(*['']))])
 
     def _dead_sleep(self, wait_msec):
         startMsec = datetime.datetime.now()
@@ -76,35 +76,35 @@ class _sain_smart_tft18_lcd:
                 self.write_data(*[data])
                 self.write_buffer.splice(*[0, 1024])
             else:
-                data = self.write_buffer.slice(*[0, 1024])
-                self.write_data(*[data])
-                self.write_buffer.splice(*[0, 1024])
+                if self.write_buffer.length > 0:
+                    self.write_data(*[self.write_buffer])
+                self.write_buffer = []
 
     def _write_buffer(self, data):
         if data and data.length > 0:
             self.write_buffer = self.write_buffer.concat(*[data])
         else:
-            self.write_buffer = self.write_buffer.concat(*[data])
+            self._write_flush()
 
     def color16(self, r, g, b):
         return r and 0xf8 << 8 or g and 0xfc << 3 or b >> 3
 
     def _init_g(self):
-        self.write_command(*[_st7735__slpout])
+        self.write_command(*[ST7735_SLPOUT])
         self.obniz.wait(*[120])
-        self.write(*[_st7735__frmctr1, [0x01, 0x2c, 0x2d]])
-        self.write(*[_st7735__frmctr2, [0x01, 0x2c, 0x2d]])
-        self.write(*[_st7735__frmctr3, [0x01, 0x2c, 0x2d, 0x01, 0x2c, 0x2d]])
-        self.write(*[_st7735__invctr, [0x07]])
-        self.write(*[_st7735__pwctr1, [0xa2, 0x02, 0x84]])
-        self.write(*[_st7735__pwctr2, [0xc5]])
-        self.write(*[_st7735__pwctr3, [0x0a, 0x00]])
-        self.write(*[_st7735__pwctr4, [0x8a, 0x2a]])
-        self.write(*[_st7735__pwctr5, [0x8a, 0xee]])
-        self.write(*[_st7735__vmctr1, [0x0e]])
-        self.write(*[_st7735__gmctrp1, [0x02, 0x1c, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2d, 0x29, 0x25, 0x2b, 0x39, 0x00, 0x01, 0x03, 0x10]])
-        self.write(*[_st7735__gmctrn1, [0x03, 0x1d, 0x07, 0x06, 0x2e, 0x2c, 0x29, 0x2d, 0x2e, 0x2e, 0x37, 0x3f, 0x00, 0x00, 0x02, 0x10]])
-        self.write(*[_st7735__colmod, [_st7735_16bit]])
+        self.write(*[ST7735_FRMCTR1, [0x01, 0x2c, 0x2d]])
+        self.write(*[ST7735_FRMCTR2, [0x01, 0x2c, 0x2d]])
+        self.write(*[ST7735_FRMCTR3, [0x01, 0x2c, 0x2d, 0x01, 0x2c, 0x2d]])
+        self.write(*[ST7735_INVCTR, [0x07]])
+        self.write(*[ST7735_PWCTR1, [0xa2, 0x02, 0x84]])
+        self.write(*[ST7735_PWCTR2, [0xc5]])
+        self.write(*[ST7735_PWCTR3, [0x0a, 0x00]])
+        self.write(*[ST7735_PWCTR4, [0x8a, 0x2a]])
+        self.write(*[ST7735_PWCTR5, [0x8a, 0xee]])
+        self.write(*[ST7735_VMCTR1, [0x0e]])
+        self.write(*[ST7735_GMCTRP1, [0x02, 0x1c, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2d, 0x29, 0x25, 0x2b, 0x39, 0x00, 0x01, 0x03, 0x10]])
+        self.write(*[ST7735_GMCTRN1, [0x03, 0x1d, 0x07, 0x06, 0x2e, 0x2c, 0x29, 0x2d, 0x2e, 0x2e, 0x37, 0x3f, 0x00, 0x00, 0x02, 0x10]])
+        self.write(*[ST7735_COLMOD, [_st7735_16bit]])
 
     def init(self):
         self._reset()
@@ -113,28 +113,28 @@ class _sain_smart_tft18_lcd:
         self.set_rotation(*[0])
 
     def set_display_on(self):
-        self.write_command(*[_st7735__dispon])
+        self.write_command(*[ST7735_DISPON])
 
     def set_display_off(self):
-        self.write_command(*[_st7735__dispoff])
+        self.write_command(*[ST7735_DISPOFF])
 
     def set_display(self, on):
         if on == True:
             self.set_display_on()
         else:
-            self.set_display_on()
+            self.set_display_off()
 
     def set_inversion_on(self):
-        self.write_command(*[_st7735__invon])
+        self.write_command(*[ST7735_INVON])
 
     def set_inversion_off(self):
-        self.write_command(*[_st7735__invoff])
+        self.write_command(*[ST7735_INVOFF])
 
     def set_inversion(self, inversion):
         if inversion == True:
             self.set_inversion_on()
         else:
-            self.set_inversion_on()
+            self.set_inversion_off()
 
     def set_rotation(self, m):
         MADCTL_MY = 0x80
@@ -144,26 +144,26 @@ class _sain_smart_tft18_lcd:
         data = None
         rotation = m % 4
         if rotation==0:
-            data = [_madctl__mx or _madctl__my or _madctl__rgb]
-            self.width = _st7735__tftwidth
-            self.height = _st7735__tftheight
+            data = [MADCTL_MX or MADCTL_MY or MADCTL_RGB]
+            self.width = ST7735_TFTWIDTH
+            self.height = ST7735_TFTHEIGHT
         elif rotation==1:
-            data = [_madctl__my or _madctl__mv or _madctl__rgb]
-            self.width = _st7735__tftheight
-            self.height = _st7735__tftwidth
+            data = [MADCTL_MY or MADCTL_MV or MADCTL_RGB]
+            self.width = ST7735_TFTHEIGHT
+            self.height = ST7735_TFTWIDTH
         elif rotation==2:
-            data = [_madctl__rgb]
-            self.width = _st7735__tftwidth
-            self.height = _st7735__tftheight
+            data = [MADCTL_RGB]
+            self.width = ST7735_TFTWIDTH
+            self.height = ST7735_TFTHEIGHT
         elif rotation==3:
-            data = [_madctl__mx or _madctl__mv or _madctl__rgb]
-            self.width = _st7735__tftheight
-            self.height = _st7735__tftwidth
-        self.write(*[_st7735__madctl, data])
+            data = [MADCTL_MX or MADCTL_MV or MADCTL_RGB]
+            self.width = ST7735_TFTHEIGHT
+            self.height = ST7735_TFTWIDTH
+        self.write(*[ST7735_MADCTL, data])
         self.set_addr_window(*[0, 0, self.width - 1, self.height - 1])
 
     def set_addr_window(self, x0, y0, x1, y1):
-        self.print_debug(*[setAddrWindow: (x0: x0, y0: y0) - (x1: x1, y1: y1)])
+        self.print_debug(*["setAddrWindow: (x0: " + x0 + ", y0: " + y0 + ") - (x1: " + x1 + ", y1: " + y1 + ")"])
         if x0 < 0:
             x0 = 0
         if y0 < 0:
@@ -172,9 +172,9 @@ class _sain_smart_tft18_lcd:
             x1 = 0
         if y1 < 0:
             y1 = 0
-        self.write(*[_st7735__caset, [0x00, x0, 0x00, x1]])
-        self.write(*[_st7735__raset, [0x00, y0, 0x00, y1]])
-        self.write_command(*[_st7735__ramwr])
+        self.write(*[ST7735_CASET, [0x00, x0, 0x00, x1]])
+        self.write(*[ST7735_RASET, [0x00, y0, 0x00, y1]])
+        self.write_command(*[ST7735_RAMWR])
         self.write_buffer = []
 
     def fill_screen(self, color):
@@ -320,13 +320,9 @@ class _sain_smart_tft18_lcd:
                 a = x1
             elif x1 > b:
                 b = x1
-            else:
-                b = x1
             if x2 < a:
                 a = x2
             elif x2 > b:
-                b = x2
-            else:
                 b = x2
             self.draw_hline(*[a, y0, b - a + 1, color])
             return
@@ -341,7 +337,7 @@ class _sain_smart_tft18_lcd:
         if y1 == y2:
             last = y1
         else:
-            last = y1
+            last = y1 - 1
         # TODO: failed to generate FOR statement
         sa = dx12 * y - y1
         sb = dx02 * y - y0
@@ -403,7 +399,20 @@ class _sain_smart_tft18_lcd:
             self.draw_char2(*[x, y, ch, color, bg, size])
             return
         c = ch.char_code_at(*[0])
-        # TODO: failed to generate FOR statement
+        for i in range(0, 6, 1):
+            line = 0 if i == 5 else font[c * 5 + i]
+            for j in range(0, 8, 1):
+                if line and 0x1:
+                    if size == 1:
+                        self.draw_pixel(*[x + i, y + j, color])
+                    else:
+                        self.fill_rect(*[x + i * size, y + j * size, size, size, color])
+                elif bg != color:
+                    if size == 1:
+                        self.draw_pixel(*[x + i, y + j, bg])
+                    else:
+                        self.fill_rect(*[x + i * size, y + j * size, size, size, bg])
+                line >>= 1
 
     def draw_char2(self, x, y, ch, color, bg, size):
         size = size or 1
@@ -411,7 +420,14 @@ class _sain_smart_tft18_lcd:
             return
         pixels = [0] * 6 * 8 * size * size
         c = ch.char_code_at(*[0])
-        # TODO: failed to generate FOR statement
+        for i in range(0, 6, 1):
+            line = 0 if i == 5 else font[c * 5 + i]
+            for j in range(0, 8, 1):
+                cl = color if line and 0x1 else bg
+                for w in range(0, size, 1):
+                    for h in range(0, size, 1):
+                        pixels[i * 1 * size + w + j * 6 * size * size + h * 6 * size] = cl
+                line >>= 1
         self.raw_bound16(*[x, y, 6 * size, 8 * size, pixels])
 
     def raw_bound16(self, x, y, width, height, pixels):
@@ -423,7 +439,19 @@ class _sain_smart_tft18_lcd:
 
     def draw_string(self, x, y, str, color, bg, size, wrap):
         size = size or 1
-        # TODO: failed to generate FOR statement
+        for n in range(0, str.length, 1):
+            c = str.char_at(*[n])
+            if c == '\n':
+                y += size * 8
+                x = 0
+            elif c == '\r':
+
+            else:
+                self.draw_char(*[x, y, c, color, bg, size])
+                x += size * 6
+                if wrap and x > self.width - size * 6:
+                    y += size * 8
+                    x = 0
         return [x, y]
 
     def draw_context_bound(self, context, x0, y0, width, height, x1, y1, gray):
@@ -434,15 +462,27 @@ class _sain_smart_tft18_lcd:
         x1 = x1 or 0
         y1 = y1 or 0
         gray = gray or False
-        self.write(*[_st7735__colmod, [_st7735_18bit]])
+        self.write(*[ST7735_COLMOD, [_st7735_18bit]])
         imageData = context.get_image_data(*[x0, y0, width, height]).data
         rgb = []
-        # TODO: failed to generate FOR statement
-        self.write(*[_st7735__colmod, [_st7735_18bit]])
+        for n in range(0, image_data.length, 4):
+            r = image_data[n + 0]
+            g = image_data[n + 1]
+            b = image_data[n + 2]
+            if not gray:
+                rgb.push(*[r])
+                rgb.push(*[g])
+                rgb.push(*[b])
+            else:
+                gs = _math.round(*[0.299 * r + 0.587 * g + 0.114 * b])
+                rgb.push(*[gs])
+                rgb.push(*[gs])
+                rgb.push(*[gs])
+        self.write(*[ST7735_COLMOD, [_st7735_18bit]])
         self.set_addr_window(*[x1, y1, x1 + width - 1, y1 + height - 1])
         self._write_buffer(*[rgb])
         self._write_buffer()
-        self.write(*[_st7735__colmod, [_st7735_16bit]])
+        self.write(*[ST7735_COLMOD, [_st7735_16bit]])
 
     def draw_context(self, context, gray):
         gray = gray or False
@@ -451,11 +491,11 @@ class _sain_smart_tft18_lcd:
     def raw_bound(self, x, y, width, height, pixels):
         rgb = []
         pixels.for_each(*[lambda v: rgb.push(*[v and 0xff0000 >> 16])])
-        self.write(*[_st7735__colmod, [_st7735_18bit]])
+        self.write(*[ST7735_COLMOD, [_st7735_18bit]])
         self.set_addr_window(*[x, y, x + width - 1, y + height - 1])
         self._write_buffer(*[rgb])
         self._write_buffer()
-        self.write(*[_st7735__colmod, [_st7735_16bit]])
+        self.write(*[ST7735_COLMOD, [_st7735_16bit]])
 
     def raw(self, pixels):
         self.raw(*[0, 0, self.width, self.height, pixels])

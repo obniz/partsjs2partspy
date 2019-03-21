@@ -31,15 +31,8 @@ class _grove__mp3:
                 self.uart_send(*[0x09, 1])
             elif strage == 'sd':
                 self.uart_send(*[0x09, 2])
-            else:
-                self.uart_send(*[0x09, 2])
         else:
-            if strage == 'usb':
-                self.uart_send(*[0x09, 1])
-            elif strage == 'sd':
-                self.uart_send(*[0x09, 2])
-            else:
-                self.uart_send(*[0x09, 2])
+            self.uart_send(*[0x09, 2])
         await self.obniz.wait(*[200])
 
     def set_volume(self, vol):
@@ -56,7 +49,7 @@ class _grove__mp3:
         if folder:
             self.uart.send(*[[0x7e, 0xff, 0x06, 0x0f, 0x00, folder, track, 0xef]])
         else:
-            self.uart.send(*[[0x7e, 0xff, 0x06, 0x0f, 0x00, folder, track, 0xef]])
+            self.uart_send(*[0x12, track])
 
     def stop(self):
         self.uart_send(*[0x16, 0])

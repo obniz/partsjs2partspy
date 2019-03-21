@@ -18,7 +18,7 @@ class hx711:
         ioKeys = ['clk', 'dout']
         for key in io_keys:
             if self.params[key] and not self.obniz.is_valid_io(*[self.params[key]]):
-                raise Exception("spi start param '" + key + "' are to be valid io no")
+                raise Exception(str("spi start param '" + str(key)) + "' are to be valid io no")
         self.sck = obniz.get_io(*[self.params.sck])
         self.dout = obniz.get_io(*[self.params.dout])
         self.sck.output(*[True])
@@ -34,7 +34,8 @@ class hx711:
 
     async def read_average_wait(self, times):
         results = []
-        # TODO: failed to generate FOR statement
+        for i in range(0, times, 1):
+            results.push(*[await self.read_wait()])
         return results.reduce(*[lambda prev, current, i: prev + current, 0]) / results.length
 
     def power_down(self):

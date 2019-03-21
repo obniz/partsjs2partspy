@@ -1,6 +1,6 @@
 import asyncio
 
-class _s11059:
+class S11059:
     def __init__(self):
         self.keys = ['vcc', 'sda', 'scl', 'i2c', 'gnd']
         self.required_keys = []

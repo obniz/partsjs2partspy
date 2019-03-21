@@ -16,7 +16,9 @@ class _servo_motor:
         if self.params.pwm:
             self.pwm = self.params.pwm
         else:
-            self.pwm = self.params.pwm
+            self.pwm = obniz.get_free_pwm()
+            self.pwm_io_num = self.params.signal
+            self.pwm.start(*[{'io': self.pwm_io_num}])
         self.pwm.freq(*[50])
 
     def angle(self, ratio):
