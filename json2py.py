@@ -28,13 +28,9 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
                 with module.def_(get_expression(attr["key"])):
                     for line in attr["value"]["body"]["body"]:
                         get_statement(line, module)
-                statements = ("setattr(" +
-                    get_expression(exp["arguments"][0]) +
-                    ", " +
-                    get_expression(exp["arguments"][1]) +
-                    ", " +
-                    get_expression(attr["key"]) +
-                    ")")
+                statements = ("setattr(" + get_expression(exp["arguments"][0]) +
+                              ", " + get_expression(exp["arguments"][1]) +
+                              ", " + get_expression(attr["key"]) + ")")
                 module.stmt(statements)
             return
         module.stmt(get_expression(exp).replace(replace_from, replace_to))
@@ -133,8 +129,7 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
                         get_statement(line, module)
             else:
                 with module.elif_(get_expression(stt["discriminant"]) +
-                    "==" +
-                    get_expression(case["test"])):
+                                  "==" + get_expression(case["test"])):
                     for line in case["consequent"]:
                         if line["type"] != "BreakStatement":
                             get_statement(line, module)
@@ -143,15 +138,10 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
     if stt["type"] == "VariableDeclaration":
         for dec in stt["declarations"]:
             if dec["init"]:
-                module.stmt(
-                    dec["id"]["name"] +
-                    " = " +
-                    get_expression(dec["init"]))
+                module.stmt(dec["id"]["name"] +
+                            " = " + get_expression(dec["init"]))
             else:
-                module.stmt(
-                    dec["id"]["name"] +
-                    " = None"
-                )
+                module.stmt(dec["id"]["name"] + " = None")
         return
 
     if stt["type"] == "WhileStatement":
@@ -164,22 +154,7 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
         return
 
     if stt["type"] == "ForStatement":
-        # TODO:
         try:
-            # i = stt["init"]["declarations"][0]["id"]["name"]
-            # if (get_expression(stt["init"]["declarations"][0]["init"]) == "0" and
-            #     ("length" in stt["test"]["left"] or "length" in stt["test"]["right"]) and
-            #     stt["update"]["operator"] == "++"):
-            #     with module.for_("_i", iterator=iterator):
-            #         for line in stt["body"]["body"]:
-            #             get_statement(line,
-            #                 module,
-            #                 replace_from=iterator + "[" + i + "]",
-            #                 replace_to="_i")
-            #     return
-            # else:
-            #     module.stmt("# TODO: failed to generate FOR statement")
-            #     return
             iterator = get_expression(stt["init"]["declarations"][0]["id"])
             init = get_expression(stt["init"]["declarations"][0]["init"])
             if get_expression(stt["test"]["left"]) == iterator:
@@ -198,7 +173,6 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
                 module.stmt("# TODO: failed to generate FOR statement(test doesnt include iterator)")
                 return
             if stt["update"]["type"] == "AssignmentExpression":
-                # if get_expression(stt["update"]["left"]) == iterator:
                 step = get_expression(stt["update"]["right"])
             elif stt["update"]["type"] == "UpdateExpression":
                 step = 1
@@ -208,7 +182,8 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
 
             if "-" in stt["update"]["operator"]:
                 step *= -1
-            with module.for_(iterator, iterator="range({0}, {1}, {2})".format(init, limit, step)):
+            with module.for_(iterator,
+                             iterator="range({0}, {1}, {2})".format(init, limit, step)):
                 for line in stt["body"]["body"]:
                     get_statement(line, module)
                 return
@@ -218,17 +193,16 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
             return
     
     if stt["type"] == "ForOfStatement":
-        with module.for_(
-            get_expression(stt["left"]["declarations"][0]["id"]),
-            iterator=get_expression(stt["right"])):
+        with module.for_(get_expression(stt["left"]["declarations"][0]["id"]),
+                         iterator=get_expression(stt["right"])):
             for line in stt["body"]["body"]:
                 get_statement(line, module)
             return
 
     if stt["type"] == "ForInStatement":
         with module.for_(
-            get_expression(stt["left"]["declarations"][0]["id"]) + ", _",
-            iterator="enumerate(" + get_expression(stt["right"]) + ")"):
+                get_expression(stt["left"]["declarations"][0]["id"]) + ", _",
+                iterator="enumerate(" + get_expression(stt["right"]) + ")"):
             for line in stt["body"]["body"]:
                 get_statement(line, module)
             return
@@ -289,10 +263,8 @@ def get_expression(exp):
             for param in exp["params"]:
                 params += param["name"] + ", "
             params = params[:-2]
-            return ("lambda " +
-                params +
-                ": " +
-                get_expression(exp["body"]["body"][0]["expression"]))
+            return ("lambda " + params + ": " +
+                    get_expression(exp["body"]["body"][0]["expression"]))
         except:
             return "# TODO: failed to generate Function Expression"
 
@@ -302,26 +274,20 @@ def get_expression(exp):
             for param in exp["params"]:
                 params += param["name"] + ", "
             params = params[:-2]
-            return ("lambda " +
-                params +
-                ": " +
-                get_expression(exp["body"]["body"][0]["argument"]))
+            return ("lambda " + params + ": " +
+                    get_expression(exp["body"]["body"][0]["argument"]))
         except KeyError:
             return "# TODO: ArrowFunctionExpression was here"
 
     if exp["type"] == "AssignmentExpression":
         return (get_expression(exp["left"]) +
-            " " +
-            get_operator(exp["operator"]) +
-            " " +
-            get_expression(exp["right"]))
+                " " + get_operator(exp["operator"]) +
+                " " + get_expression(exp["right"]))
     
     if exp["type"] == "LogicalExpression":
         return (get_expression(exp["left"]) +
-            " " +
-            get_operator(exp["operator"]) +
-            " " +
-            get_expression(exp["right"]))
+                " " + get_operator(exp["operator"]) +
+                " " + get_expression(exp["right"]))
 
     if exp["type"] == "BinaryExpression":
         # for string concatnation
@@ -329,18 +295,14 @@ def get_expression(exp):
             ("Literal" in exp["left"]["type"] and type(exp["left"]["value"]) is str)
             ):
             return (get_expression(exp["left"]) +
-            " " +
-            get_operator(exp["operator"]) +
-            " str(" +
-            get_expression(exp["right"]) + ")")
+                    " " + get_operator(exp["operator"]) +
+                    " str(" + get_expression(exp["right"]) + ")")
         elif ("+" in exp["operator"] and
             ("Literal" in exp["right"]["type"] and type(exp["right"]["value"]) is str)
             ):
             return ("str(" +get_expression(exp["left"]) +
-            ") " +
-            get_operator(exp["operator"]) +
-            " " +
-            get_expression(exp["right"]))
+                    ") " + get_operator(exp["operator"]) +
+                    " " + get_expression(exp["right"]))
 
         if get_operator(exp["operator"]) in ["+", "-"]:
             return ("(" + get_expression(exp["left"]) +
@@ -348,10 +310,8 @@ def get_expression(exp):
                     " " + get_expression(exp["right"]) + ")")
 
         return (get_expression(exp["left"]) +
-            " " +
-            get_operator(exp["operator"]) +
-            " " +
-            get_expression(exp["right"]))
+                " " + get_operator(exp["operator"]) +
+                " " + get_expression(exp["right"]))
 
     if exp["type"] == "UnaryExpression":
         if exp["operator"] == "typeof":
@@ -365,13 +325,11 @@ def get_expression(exp):
             if "name" in exp["property"]:
                 name = snake(exp["property"]["name"])
                 return (get_expression(exp["object"]) +
-                    "[" +
-                    exp["property"]["name"] +
-                    "]")
+                        "[" + exp["property"]["name"] +
+                        "]")
             return (get_expression(exp["object"]) +
-                "[" +
-                get_expression(exp["property"]) +
-                "]")
+                    "[" + get_expression(exp["property"]) +
+                    "]")
         name = snake(exp["property"]["name"])
         if name == "bind":
             return get_expression(exp["object"])
@@ -383,7 +341,6 @@ def get_expression(exp):
         return "self"
     
     if exp["type"] == "ArrayExpression" or exp["type"] == "ArrayPattern":
-        # return str([get_expression(elm) for elm in exp["elements"]])
         if not exp["elements"]:
             listr = "[]"
         else:
@@ -413,9 +370,7 @@ def get_expression(exp):
             return get_expression(exp["callee"])
 
         return (get_expression(exp["callee"]) + 
-            "(*" +
-            listr +
-            ")")
+                "(*" + listr + ")")
     
     if exp["type"] == "ObjectExpression":
         obj = "AttrDefault(bool, {"
@@ -437,13 +392,10 @@ def get_expression(exp):
             return obj
 
     if exp["type"] == "ConditionalExpression":
-        # test ? T : F
-        # T if test else F
+        # test ? T : F -> T if test else F
         return (get_expression(exp["consequent"]) +
-            " if " +
-            get_expression(exp["test"]) +
-            " else " +
-            get_expression(exp["alternate"]))
+                " if " + get_expression(exp["test"]) +
+                " else " + get_expression(exp["alternate"]))
     
     if exp["type"] == "NewExpression":
         # TODO:
@@ -467,10 +419,7 @@ def get_expression(exp):
                 listr += get_expression(arg) + ", "
             listr = listr[:-2] + "]"
             return (get_expression(exp["callee"]) + 
-                    "(*" +
-                    listr +
-                    ")")
-
+                    "(*" + listr + ")")
     
     if exp["type"] == "SpreadElement":
         # スプレッド演算子はPythonには存在しない
