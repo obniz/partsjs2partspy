@@ -45,7 +45,7 @@ class _7SegmentLED:
 
     def print(self, data):
         if type(data) == 'number':
-            data = parse_int(*[data])
+            data = int(*[data])
             data = data % 10
             for i in range(0, 7, 1):
                 if self.ios[i]:

@@ -13,14 +13,14 @@ class WS2812B:
         self.obniz = obniz
         obniz.set_vcc_gnd(*[self.params.vcc, self.params.gnd, '5v'])
         self.params.mode = 'master'
-        self.params.frequency = parse_int(*[3.33 * 1000 * 1000])
+        self.params.frequency = int(*[3.33 * 1000 * 1000])
         self.params.mosi = self.params.din
         self.params.drive = '5v'
         self.spi = self.obniz.get_spi_with_config(*[self.params])
 
     @staticmethod
     def _generate_from_byte(val):
-        val = parse_int(*[val])
+        val = int(*[val])
         zero = 0x8
         one = 0xe
         ret = []

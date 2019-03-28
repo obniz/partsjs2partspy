@@ -28,10 +28,10 @@ class GP2Y0A21YK0F:
             val = 0.001
         distance = 19988.34 * _math.pow(*[val / 5.0 * 1024, -1.25214]) * 10
         if self._unit == 'mm':
-            distance = parse_int(*[distance * 10]) / 10
+            distance = int(*[distance * 10]) / 10
         else:
             distance *= 0.0393701
-            distance = parse_int(*[distance * 1000]) / 1000
+            distance = int(*[distance * 1000]) / 1000
         return distance
 
     def get_wait(self):

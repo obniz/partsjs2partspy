@@ -20,7 +20,7 @@ class WS2811:
 
     @staticmethod
     def _generate_from_byte(val):
-        val = parse_int(*[val])
+        val = int(*[val])
         zero = 0x8
         one = 0xe
         ret = []

@@ -53,7 +53,7 @@ class StepperMotor:
                     current_phase = (instruction_length - 1)
                 array.push(*[instructions[currentPhase]])
         msec = 1000 / self.frequency
-        msec = parse_int(*[msec])
+        msec = int(*[msec])
         if msec < 1:
             msec = 1
         state = # TODO: ArrowFunctionExpression was here
@@ -95,7 +95,7 @@ class StepperMotor:
         return self.current_step / self.rotation_step_count * 360
 
     def current_angle(self):
-        angle = parse_int(*[self.current_rotation() * 1000]) % 360000 / 1000
+        angle = int(*[self.current_rotation() * 1000]) % 360000 / 1000
         if angle < 0:
             angle = (360 - angle)
         return angle

@@ -276,6 +276,8 @@ def get_expression(exp):
         )
     
     if exp["type"] == "Identifier":
+        if exp["name"] == "parseInt":
+            return "int"
         return snake(exp["name"])
 
     if exp["type"] == "FunctionExpression":

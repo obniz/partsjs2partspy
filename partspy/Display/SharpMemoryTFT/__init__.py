@@ -28,7 +28,7 @@ class SharpMemoryTFT:
         obniz.set_vcc_gnd(*[self.params.vcc, self.params.gnd, '5v'])
         obniz.set_vcc_gnd(*[self.params.vcc_a, self.params.gnd_a, '5v'])
         self.params.mode = 'master'
-        self.params.frequency = parse_int(*[1000 * 1000])
+        self.params.frequency = int(*[1000 * 1000])
         self.params.clk = self.params.sclk
         self.params.drive = '5v'
         self.spi = self.obniz.get_spi_with_config(*[self.params])
@@ -65,7 +65,7 @@ class SharpMemoryTFT:
         self.io_cs.output(*[True])
         for i in range(0, totalbytes, 1):
             array[] = raw_data[i]
-            currentline = parse_int(*[((i + 1) / self.width / 8 + 1), 10])
+            currentline = int(*[((i + 1) / self.width / 8 + 1), 10])
             if currentline != oldline:
                 array[] = 0x00
                 if currentline <= self.height:
@@ -205,10 +205,10 @@ class SharpMemoryTFT:
         data = image_data.data
         for i in range(0, data.length, 4):
             brightness = ((0.34 * data[i] + 0.5 * data[(i + 1)]) + 0.16 * data[(i + 2)])
-            index = parse_int(*[i / 4])
-            line = parse_int(*[index / self.width])
-            col = parse_int(*[(index - line * self.width) / 8])
-            bits = parse_int(*[(index - line * self.width)]) % 8
+            index = int(*[i / 4])
+            line = int(*[index / self.width])
+            col = int(*[(index - line * self.width) / 8])
+            bits = int(*[(index - line * self.width)]) % 8
             if bits == 0:
                 vram[(line * stride + col)] = 0x00
             if brightness > 0x73:

@@ -86,10 +86,10 @@ class MatrixLED_MAX7219:
         data = image_data.data
         for i in range(0, data.length, 4):
             brightness = ((0.34 * data[i] + 0.5 * data[(i + 1)]) + 0.16 * data[(i + 2)])
-            index = parse_int(*[i / 4])
-            line = parse_int(*[index / self.width])
-            col = parse_int(*[(index - line * self.width) / 8])
-            bits = parse_int(*[(index - line * self.width)]) % 8
+            index = int(*[i / 4])
+            line = int(*[index / self.width])
+            col = int(*[(index - line * self.width) / 8])
+            bits = int(*[(index - line * self.width)]) % 8
             if bits == 0:
                 self.vram[line][col] = 0x00
             if brightness > 0x7f:

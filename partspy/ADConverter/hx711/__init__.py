@@ -47,10 +47,10 @@ class hx711:
         self.sck.output(*[False])
 
     async def zero_adjust(self, times):
-        times = parse_int(*[times]) or 1
+        times = int(*[times]) or 1
         self.offset = await self.read_average_wait(*[times])
 
     async def get_value_wait(self, times):
-        times = parse_int(*[times]) or 1
+        times = int(*[times]) or 1
         val = await self.read_average_wait(*[times])
         return (val - self.offset) / self.scale

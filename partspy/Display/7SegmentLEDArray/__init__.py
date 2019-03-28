@@ -18,7 +18,7 @@ class _7SegmentLEDArray:
 
     def print(self, data):
         if type(data) == 'number':
-            data = parse_int(*[data])
+            data = int(*[data])
             print = # TODO: ArrowFunctionExpression was here
             animations = []
             for i in range(0, self.segments.length, 1):

@@ -18,7 +18,7 @@ class Speaker:
     def play(self, freq):
         if type(freq) != 'number':
             raise Exception('freq must be a number')
-        freq = parse_int(*[freq])
+        freq = int(*[freq])
         if freq > 0:
             self.pwm.freq(*[freq])
             self.pwm.pulse(*[1 / freq / 2 * 1000])

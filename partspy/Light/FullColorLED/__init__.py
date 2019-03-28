@@ -44,9 +44,9 @@ class FullColorLED:
         self.rgb(*[0, 0, 0])
 
     def rgb(self, r, g, b):
-        r = _math.min(*[_math.max(*[parse_int(*[r]), 0]), 255])
-        g = _math.min(*[_math.max(*[parse_int(*[g]), 0]), 255])
-        b = _math.min(*[_math.max(*[parse_int(*[b]), 0]), 255])
+        r = _math.min(*[_math.max(*[int(*[r]), 0]), 255])
+        g = _math.min(*[_math.max(*[int(*[g]), 0]), 255])
+        b = _math.min(*[_math.max(*[int(*[b]), 0]), 255])
         if self.commontype == self.COMMON_TYPE_ANODE:
             r = (255 - r)
             g = (255 - g)

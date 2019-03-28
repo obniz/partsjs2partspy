@@ -82,7 +82,7 @@ class PCA9685:
         prescaleval /= 4096.0
         prescaleval /= frequency * 0.9
         prescaleval -= 1.0
-        prescale = parse_int(*[_math.floor(*[(prescaleval + 0.5)])])
+        prescale = int(*[_math.floor(*[(prescaleval + 0.5)])])
         mode1 = self._regs[self._commands.MODE1]
         self.i2c.write(*[self.address, [self._commands.MODE1, mode1 and 0x7f or self._commands.bits.SLEEP_ENABLE]])
         self.i2c.write(*[self.address, [self._commands.PRESCALE, prescale]])
