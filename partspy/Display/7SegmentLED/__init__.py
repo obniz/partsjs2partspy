@@ -1,13 +1,15 @@
-class _7_segment_led:
+from attrdict import AttrDefault
+
+class _7SegmentLED:
     def __init__(self):
         self.keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'dp', 'common', 'commonType']
         self.required_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
         self.digits = [0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x6f]
-        self.display_io_names = {'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'f': 'f', 'g': 'g', 'dp': 'dp', 'common': 'com'}
+        self.display_io_names = AttrDefault(bool, {'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'f': 'f', 'g': 'g', 'dp': 'dp', 'common': 'com'})
 
     @staticmethod
     def info():
-        return {'name': '7SegmentLED'}
+        return AttrDefault(bool, {'name': '7SegmentLED'})
 
     def wired(self, obniz):
         def get_io(io):

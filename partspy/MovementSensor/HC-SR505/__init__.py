@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 class HCSR505:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'signal']
@@ -5,7 +7,7 @@ class HCSR505:
 
     @staticmethod
     def info():
-        return {'name': 'HC-SR505'}
+        return AttrDefault(bool, {'name': 'HC-SR505'})
 
     def wired(self, obniz):
         self.obniz = obniz

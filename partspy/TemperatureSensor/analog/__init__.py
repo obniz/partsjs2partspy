@@ -1,6 +1,6 @@
 import asyncio
 
-class _analog_templature_sensor:
+class AnalogTemplatureSensor:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'output']
         self.required_keys = ['output']

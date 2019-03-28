@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 class WS2812:
     def __init__(self):
         self.keys = ['din', 'vcc', 'gnd']
@@ -5,7 +7,7 @@ class WS2812:
 
     @staticmethod
     def info():
-        return {'name': 'WS2812'}
+        return AttrDefault(bool, {'name': 'WS2812'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -28,7 +30,7 @@ class WS2812:
                 byte = one << 4
             else:
                 byte = zero << 4
-            if val and 0x80 >> i + 1:
+            if val and 0x80 >> (i + 1):
                 byte |= one
             else:
                 byte |= zero
@@ -46,7 +48,7 @@ class WS2812:
     def _generate_hsv_color(h, s, v):
         C = v * s
         Hp = h / 60
-        X = C * 1 - _math.abs(*[_hp % 2 - 1])
+        X = C * (1 - _math.abs(*[(_hp % 2 - 1)]))
         R = None
         G = None
         B = None
@@ -62,8 +64,8 @@ class WS2812:
             [R, G, B] = [X, 0, C]
         if 5 <= _hp and _hp < 6:
             [R, G, B] = [C, 0, X]
-        m = v - C
-        [R, G, B] = [R + m, G + m, B + m]
+        m = (v - C)
+        [R, G, B] = [(R + m), (G + m), (B + m)]
         R = _math.floor(*[R * 255])
         G = _math.floor(*[G * 255])
         B = _math.floor(*[B * 255])

@@ -1,11 +1,13 @@
-class _7_segment_led__max7219:
+from attrdict import AttrDefault
+
+class _7SegmentLED_MAX7219:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'din', 'cs', 'clk']
         self.required_keys = ['din', 'cs', 'clk']
 
     @staticmethod
     def info():
-        return {'name': '7SegmentLED_MAX7219'}
+        return AttrDefault(bool, {'name': '7SegmentLED_MAX7219'})
 
     def wired(self, obniz):
         self.cs = obniz.get_io(*[self.params.cs])
@@ -27,19 +29,19 @@ class _7_segment_led__max7219:
         self.digits = digits
         self.write_all_disp(*[[0x09, 0xff]])
         self.write_all_disp(*[[0x0a, 0x05]])
-        self.write_all_disp(*[[0x0b, digits - 1]])
+        self.write_all_disp(*[[0x0b, (digits - 1)]])
         self.write_all_disp(*[[0x0c, 0x01]])
         self.write_all_disp(*[[0x0f, 0x00]])
         self.obniz.wait(*[10])
 
     def clear(self, disp):
         for i in range(0, self.digits, 1):
-            self.write_one_disp(*[disp, [i + 1, 0x0f]])
+            self.write_one_disp(*[disp, [(i + 1), 0x0f]])
 
     def clear_all(self):
         for i in range(0, self.num_of_disp, 1):
             for j in range(0, self.digits, 1):
-                self.write_all_disp(*[[j + 1, 0x0f]])
+                self.write_all_disp(*[[(j + 1), 0x0f]])
 
     def test(self):
         self.write_all_disp(*[[0x0f, 0x00]])
@@ -59,13 +61,13 @@ class _7_segment_led__max7219:
         for i in range(0, disp, 1):
             self.spi.write(*[[0x00, 0x00]])
         self.spi.write(*[data])
-        for i in range(0, self.num_of_disp - disp + 1, 1):
+        for i in range(0, (self.num_of_disp - (disp + 1)), 1):
             self.spi.write(*[[0x00, 0x00]])
         self.cs.output(*[True])
 
     def set_number(self, disp, digit, number, dp):
-        if digit >= 0 and digit <= self.digits - 1:
-            self.write_one_disp(*[disp, [digit + 1, self.encode_bcd(*[number, dp])]])
+        if digit >= 0 and digit <= (self.digits - 1):
+            self.write_one_disp(*[disp, [(digit + 1), self.encode_bcd(*[number, dp])]])
 
     def encode_bcd(self, decimal, dp):
         dpreg = None

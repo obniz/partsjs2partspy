@@ -1,11 +1,13 @@
-class _matrix_led__max7219:
+from attrdict import AttrDefault
+
+class MatrixLED_MAX7219:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'din', 'cs', 'clk']
         self.required_keys = ['din', 'cs', 'clk']
 
     @staticmethod
     def info():
-        return {'name': 'MatrixLED_MAX7219'}
+        return AttrDefault(bool, {'name': 'MatrixLED_MAX7219'})
 
     def wired(self, obniz):
         self.cs = obniz.get_io(*[self.params.cs])
@@ -64,7 +66,7 @@ class _matrix_led__max7219:
 
     def write_vram(self):
         for line_num in range(0, self.height, 1):
-            addr = line_num + 1
+            addr = (line_num + 1)
             line = self.vram[line_num]
             data = []
             for col in range(0, line.length, 1):
@@ -83,11 +85,11 @@ class _matrix_led__max7219:
         imageData = ctx.get_image_data(*[0, 0, self.width, self.height])
         data = image_data.data
         for i in range(0, data.length, 4):
-            brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]
+            brightness = ((0.34 * data[i] + 0.5 * data[(i + 1)]) + 0.16 * data[(i + 2)])
             index = parse_int(*[i / 4])
             line = parse_int(*[index / self.width])
-            col = parse_int(*[index - line * self.width / 8])
-            bits = parse_int(*[index - line * self.width]) % 8
+            col = parse_int(*[(index - line * self.width) / 8])
+            bits = parse_int(*[(index - line * self.width)]) % 8
             if bits == 0:
                 self.vram[line][col] = 0x00
             if brightness > 0x7f:

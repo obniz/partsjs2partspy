@@ -1,4 +1,6 @@
-class _infrared_led:
+from attrdict import AttrDefault
+
+class InfraredLED:
     def __init__(self):
         self.keys = ['anode', 'cathode']
         self.required_keys = ['anode']
@@ -6,7 +8,7 @@ class _infrared_led:
 
     @staticmethod
     def info():
-        return {'name': 'InfraredLED'}
+        return AttrDefault(bool, {'name': 'InfraredLED'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -18,11 +20,11 @@ class _infrared_led:
             self.io_cathode = obniz.get_io(*[self.params.cathode])
             self.io_cathode.output(*[False])
         self.pwm = self.obniz.get_free_pwm()
-        self.pwm.start(*[{'io': self.params.anode}])
+        self.pwm.start(*[AttrDefault(bool, {'io': self.params.anode})])
         self.pwm.freq(*[38000])
         self.obniz.wait(*[150])
 
     def send(self, arr):
-        if arr and arr.length > 0 and arr[arr.length - 1] == 1:
+        if arr and arr.length > 0 and arr[(arr.length - 1)] == 1:
             arr.push(*[0])
         self.pwm.modulate(*['am', self.data_symbol_length, arr])

@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class hx711:
@@ -9,7 +11,7 @@ class hx711:
 
     @staticmethod
     def info():
-        return {'name': 'hx711'}
+        return AttrDefault(bool, {'name': 'hx711'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -25,18 +27,18 @@ class hx711:
 
     async def read_wait(self):
         self.sck.output(*[False])
-        self.spi.start(*[{'mode': 'master', 'clk': self.params.sck, 'miso': self.params.dout, 'frequency': 66 * 1000}])
+        self.spi.start(*[AttrDefault(bool, {'mode': 'master', 'clk': self.params.sck, 'miso': self.params.dout, 'frequency': 66 * 1000})])
         ret = await self.spi.write_wait(*[[0, 0, 0]])
         self.spi.end(*[True])
         self.sck.output(*[False])
         flag = 1 if ret[0] and 0x80 == 0 else -1
-        return flag * ret[0] and 0x7f << 16 + ret[1] << 8 + ret[2] << 0
+        return flag * ((ret[0] and 0x7f << 16 + ret[1] << 8) + ret[2] << 0)
 
     async def read_average_wait(self, times):
         results = []
         for i in range(0, times, 1):
             results.push(*[await self.read_wait()])
-        return results.reduce(*[lambda prev, current, i: prev + current, 0]) / results.length
+        return results.reduce(*[lambda prev, current, i: (prev + current), 0]) / results.length
 
     def power_down(self):
         self.sck.output(*[True])
@@ -51,4 +53,4 @@ class hx711:
     async def get_value_wait(self, times):
         times = parse_int(*[times]) or 1
         val = await self.read_average_wait(*[times])
-        return val - self.offset / self.scale
+        return (val - self.offset) / self.scale

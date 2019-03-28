@@ -1,11 +1,13 @@
-class _pa_pirs_vz:
+from attrdict import AttrDefault
+
+class PaPIRsVZ:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'signal']
         self.required_keys = ['signal']
 
     @staticmethod
     def info():
-        return {'name': 'PaPIRsVZ'}
+        return AttrDefault(bool, {'name': 'PaPIRsVZ'})
 
     def wired(self, obniz):
         self.obniz = obniz

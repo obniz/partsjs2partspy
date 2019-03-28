@@ -1,12 +1,14 @@
+from attrdict import AttrDefault
+
 class USB:
     def __init__(self):
         self.keys = ['vcc', 'gnd']
         self.required_keys = ['vcc', 'gnd']
-        self.display_io_names = {'vcc': 'vcc', 'gnd': 'gnd'}
+        self.display_io_names = AttrDefault(bool, {'vcc': 'vcc', 'gnd': 'gnd'})
 
     @staticmethod
     def info():
-        return {'name': 'USB'}
+        return AttrDefault(bool, {'name': 'USB'})
 
     def wired(self, obniz):
         self.obniz = obniz

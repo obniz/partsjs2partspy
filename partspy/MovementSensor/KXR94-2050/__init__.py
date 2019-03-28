@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class KXR94_2050:
@@ -7,7 +9,7 @@ class KXR94_2050:
 
     @staticmethod
     def info():
-        return {'name': 'KXR94-2050'}
+        return AttrDefault(bool, {'name': 'KXR94-2050'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -40,13 +42,13 @@ class KXR94_2050:
         self.offset_voltage = pwr_voltage / 2
 
     def voltage2gravity(self, volt):
-        return volt - self.offset_voltage / self.sensitivity
+        return (volt - self.offset_voltage) / self.sensitivity
 
     def get(self):
         return self._get()
 
     def _get(self):
-        return {'x': self.voltage2gravity(*[self._x_val]), 'y': self.voltage2gravity(*[self._y_val]), 'z': self.voltage2gravity(*[self._z_val])}
+        return AttrDefault(bool, {'x': self.voltage2gravity(*[self._x_val]), 'y': self.voltage2gravity(*[self._y_val]), 'z': self.voltage2gravity(*[self._z_val])})
 
     async def get_wait(self):
         self._x_val = await self.ad_x.get_wait()

@@ -1,6 +1,8 @@
+from attrdict import AttrDefault
+
 import asyncio
 
-class _enc03_r__module:
+class ENC03R_Module:
     def __init__(self):
         self.keys = ['vcc', 'out1', 'out2', 'gnd']
         self.required = ['out1', 'out2']
@@ -8,7 +10,7 @@ class _enc03_r__module:
 
     @staticmethod
     def info():
-        return {'name': 'ENC03R_Module'}
+        return AttrDefault(bool, {'name': 'ENC03R_Module'})
 
     def wired(self, obniz):
         self.obniz = obniz

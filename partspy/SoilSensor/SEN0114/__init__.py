@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class SEN0114:
@@ -7,7 +9,7 @@ class SEN0114:
 
     @staticmethod
     def info():
-        return {'name': 'SEN0114'}
+        return AttrDefault(bool, {'name': 'SEN0114'})
 
     def wired(self, obniz):
         self.obniz = obniz

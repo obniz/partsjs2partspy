@@ -1,11 +1,13 @@
-class _solenoid:
+from attrdict import AttrDefault
+
+class Solenoid:
     def __init__(self):
         self.keys = ['gnd', 'signal']
         self.required_keys = ['signal']
 
     @staticmethod
     def info():
-        return {'name': 'Solenoid'}
+        return AttrDefault(bool, {'name': 'Solenoid'})
 
     def wired(self, obniz):
         self.obniz = obniz

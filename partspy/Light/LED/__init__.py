@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 class LED:
     def __init__(self):
         self.keys = ['anode', 'cathode']
@@ -5,7 +7,7 @@ class LED:
 
     @staticmethod
     def info():
-        return {'name': 'LED'}
+        return AttrDefault(bool, {'name': 'LED'})
 
     def wired(self, obniz):
         def get_io(io):
@@ -42,5 +44,5 @@ class LED:
     def blink(self, interval):
         if not interval:
             interval = 100
-        frames = [{'duration': interval, 'state': lambda index: self.io_anode.output(*[True])}, {'duration': interval, 'state': lambda index: self.io_anode.output(*[False])}]
+        frames = [AttrDefault(bool, {'duration': interval, 'state': lambda index: self.io_anode.output(*[True])}), AttrDefault(bool, {'duration': interval, 'state': lambda index: self.io_anode.output(*[False])})]
         self.obniz.io.animation(*[self.animation_name, 'loop', frames])

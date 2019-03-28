@@ -1,17 +1,19 @@
-class _speaker:
+from attrdict import AttrDefault
+
+class Speaker:
     def __init__(self, obniz):
         self.keys = ['signal', 'gnd']
         self.required_keys = ['gnd']
 
     @staticmethod
     def info():
-        return {'name': 'Speaker'}
+        return AttrDefault(bool, {'name': 'Speaker'})
 
     def wired(self, obniz):
         self.obniz = obniz
         self.obniz.set_vcc_gnd(*[null, self.params.gnd, '5v'])
         self.pwm = obniz.get_free_pwm()
-        self.pwm.start(*[{'io': self.params.signal}])
+        self.pwm.start(*[AttrDefault(bool, {'io': self.params.signal})])
 
     def play(self, freq):
         if type(freq) != 'number':

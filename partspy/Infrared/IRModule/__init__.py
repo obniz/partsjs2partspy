@@ -1,11 +1,13 @@
-class _irmodule:
+from attrdict import AttrDefault
+
+class IRModule:
     def __init__(self):
         self.keys = ['recv', 'vcc', 'send', 'gnd']
         self.required_keys = ['recv', 'send']
 
     @staticmethod
     def info():
-        return {'name': 'IRModule'}
+        return AttrDefault(bool, {'name': 'IRModule'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -14,13 +16,13 @@ class _irmodule:
             raise Exception('recv is not valid io')
         if not obniz.is_valid_io(*[self.params.send]):
             raise Exception('send is not valid io')
-        self.sensor = obniz.wired(*['IRSensor', {'output': self.params.recv}])
+        self.sensor = obniz.wired(*['IRSensor', AttrDefault(bool, {'output': self.params.recv})])
         self.set_getter_setter(*['sensor', 'duration'])
         self.set_getter_setter(*['sensor', 'dataInverted'])
         self.set_getter_setter(*['sensor', 'cutTail'])
         self.set_getter_setter(*['sensor', 'output_pullup'])
         self.set_getter_setter(*['sensor', 'ondetect'])
-        self.led = obniz.wired(*['InfraredLED', {'anode': self.params.send}])
+        self.led = obniz.wired(*['InfraredLED', AttrDefault(bool, {'anode': self.params.send})])
 
     def send(self, arr):
         self.led.send(*[arr])

@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class HCSR04:
@@ -10,7 +12,7 @@ class HCSR04:
 
     @staticmethod
     def info():
-        return {'name': 'HC-SR04'}
+        return AttrDefault(bool, {'name': 'HC-SR04'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -24,7 +26,7 @@ class HCSR04:
 
     def measure(self, callback):
         self = self
-        self.obniz.measure.echo(*[{'io_pulse': self.trigger, 'io_echo': self.echo, 'pulse': 'positive', 'pulse_width': 0.011, 'measure_edges': 3, 'timeout': 10 / 340 * 1000, 'callback': # TODO: ArrowFunctionExpression was here}])
+        self.obniz.measure.echo(*[AttrDefault(bool, {'io_pulse': self.trigger, 'io_echo': self.echo, 'pulse': 'positive', 'pulse_width': 0.011, 'measure_edges': 3, 'timeout': 10 / 340 * 1000, 'callback': # TODO: ArrowFunctionExpression was here})])
 
     async def measure_wait(self):
         return await# TODO: ArrowFunctionExpression was here

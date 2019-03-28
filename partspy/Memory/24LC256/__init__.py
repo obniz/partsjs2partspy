@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class _24LC256:
@@ -7,7 +9,7 @@ class _24LC256:
 
     @staticmethod
     def info():
-        return {'name': '24LC256'}
+        return AttrDefault(bool, {'name': '24LC256'})
 
     def wired(self, obniz):
         self.params.mode = self.params.mode or 'master'
@@ -20,7 +22,7 @@ class _24LC256:
         array.push(*[address and 0xff])
         array.push.apply(*[array, data])
         self.i2c.write(*[0x50, array])
-        self.obniz.wait(*[4 + 1])
+        self.obniz.wait(*[(4 + 1)])
 
     async def get_wait(self, address, length):
         array = []

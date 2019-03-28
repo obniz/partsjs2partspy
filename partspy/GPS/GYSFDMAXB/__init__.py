@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import datetime
 
 class GYSFDMAXB:
@@ -6,11 +8,11 @@ class GYSFDMAXB:
         self.required_keys = ['txd', 'rxd']
         self.io_keys = self.keys
         self.display_name = 'gps'
-        self.display_io_names = {'txd': 'txd', 'rxd': 'rxd', '_opps': '1pps'}
+        self.display_io_names = AttrDefault(bool, {'txd': 'txd', 'rxd': 'rxd', '_opps': '1pps'})
 
     @staticmethod
     def info():
-        return {'name': 'GYSFDMAXB'}
+        return AttrDefault(bool, {'name': 'GYSFDMAXB'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -21,17 +23,17 @@ class GYSFDMAXB:
         self._opps = self.params._opps
         self.obniz.set_vcc_gnd(*[self.params.vcc, self.params.gnd, '5v'])
         self.uart = obniz.get_free_uart()
-        self.uart.start(*[{'tx': self.params.txd, 'rx': self.params.rxd, 'baud': 9600, 'drive': '3v'}])
-        self.edited_data = }
+        self.uart.start(*[AttrDefault(bool, {'tx': self.params.txd, 'rx': self.params.rxd, 'baud': 9600, 'drive': '3v'})])
+        self.edited_data = AttrDict({})
         self.edited_data.enable = False
         self.edited_data.GPGSV = [0] * 4
         self.on1pps = null
         self.last1pps = 0
-        self.gps_info = }
-        self.gps_info._sentence_type = {'GPGGA': 0x0001, 'GPGSA': 0x0002, 'GPGSV': 0x0004, 'GPRMC': 0x0008, 'GPVTG': 0x0010, 'GPZDA': 0x0020}
+        self.gps_info = AttrDict({})
+        self.gps_info._sentence_type = AttrDefault(bool, {'GPGGA': 0x0001, 'GPGSA': 0x0002, 'GPGSV': 0x0004, 'GPRMC': 0x0008, 'GPVTG': 0x0010, 'GPZDA': 0x0020})
         self.gps_info.status = 'V'
         self.gps_info.sentences = []
-        self.gps_info.satellite_info = {'satellites': [], 'in_view': 0}
+        self.gps_info.satellite_info = AttrDefault(bool, {'satellites': [], 'in_view': 0})
 
     def start1pps(self, callback):
         self.on1pps = callback
@@ -47,8 +49,8 @@ class GYSFDMAXB:
         if self.uart.is_data_exists():
             pos = self.uart.received.index_of(*[0x0a])
             if pos >= 0:
-                results = self.uart.received.slice(*[0, pos - 1])
-                self.uart.received.splice(*[0, pos + 1])
+                results = self.uart.received.slice(*[0, (pos - 1)])
+                self.uart.received.splice(*[0, (pos + 1)])
                 return self.uart.try_convert_string(*[results])
         return ''
 
@@ -62,9 +64,9 @@ class GYSFDMAXB:
         while sentence.length > 0:
             part = sentence.split(*[','])
             if sentence.slice(*[-4, -3]) != ',':
-                st = part[part.length - 1].slice(*[0, -3])
-                part.push(*[part[part.length - 1].slice(*[-3])])
-                part[part.length - 2] = st
+                st = part[(part.length - 1)].slice(*[0, -3])
+                part.push(*[part[(part.length - 1)].slice(*[-3])])
+                part[(part.length - 2)] = st
             self.edited_data.sentence = part.join(*[','])
             if part[0]=='$GPGGA':
                 self.edited_data.GPGGA = part
@@ -77,14 +79,14 @@ class GYSFDMAXB:
                 if n > self.edited_data.GPGSV.length:
                     while n > self.edited_data.GPGSV.length:
                         self.edited_data.GPGSV.push(*[[]])
-                self.edited_data.GPGSV[n - 1] = part
+                self.edited_data.GPGSV[(n - 1)] = part
             elif part[0]=='$GPRMC':
                 self.edited_data.GPRMC = part
             elif part[0]=='$GPVTG':
                 self.edited_data.GPVTG = part
             elif part[0]=='$GPZDA':
                 self.edited_data.GPZDA = part
-                utc = str(str(str(str(str(str(part[4]) + '/' + part[3]) + '/' + part[2]) + ' ' + part[1].substring(*[0, 2])) + ':' + part[1].substring(*[2, 4])) + ':' + part[1].substring(*[4, 6])) + ' +00:00'
+                utc = str((str((str((str((str((str(part[4]) + '/' + part[3])) + '/' + part[2])) + ' ' + part[1].substring(*[0, 2]))) + ':' + part[1].substring(*[2, 4]))) + ':' + part[1].substring(*[4, 6]))) + ' +00:00'
                 self.edited_data.timestamp = datetime.datetime.now()
             else:
                 format = part[0].substr(*[1])
@@ -122,7 +124,7 @@ class GYSFDMAXB:
                 self.gps_info.vdop = parse_float(*[gsa[17]])
                 for i in range(0, NMEA_MAXSAT, 1):
                     for j in range(0, self.gps_info.satellite_info.in_view, 1):
-                        if self.gps_info.satellite_info.satellites[j] and gsa[i + 3] == self.gps_info.satellite_info.satellites[j].id:
+                        if self.gps_info.satellite_info.satellites[j] and gsa[(i + 3)] == self.gps_info.satellite_info.satellites[j].id:
                             self.gps_info.satellite_info.satellites[j].in_use = True
 
                 self.gps_info.satellite_info.in_use = nuse
@@ -205,26 +207,26 @@ class GYSFDMAXB:
     def nmea2dms(self, val):
         val = parse_float(*[val])
         d = _math.floor(*[val / 100])
-        m = _math.floor(*[val / 100.0 - d * 100.0])
-        s = val / 100.0 - d * 100.0 - m * 60
-        return str(str(str(d) + '°' + m) + "'" + s.to_fixed(*[1])) + '"'
+        m = _math.floor(*[(val / 100.0 - d) * 100.0])
+        s = ((val / 100.0 - d) * 100.0 - m) * 60
+        return str((str((str(d) + '°' + m)) + "'" + s.to_fixed(*[1]))) + '"'
 
     def nmea2dm(self, val):
         val = parse_float(*[val])
         d = _math.floor(*[val / 100.0])
-        m = val / 100.0 - d * 100.0
-        return str(str(d) + '°' + m.to_fixed(*[4])) + "'"
+        m = (val / 100.0 - d) * 100.0
+        return str((str(d) + '°' + m.to_fixed(*[4]))) + "'"
 
     def nmea2dd(self, val):
         val = parse_float(*[val])
         d = _math.floor(*[val / 100.0])
-        m = _math.floor(*[val / 100.0 - d * 100.0 / 60])
-        s = val / 100.0 - d * 100.0 - m * 60 / 60 * 60
-        return parse_float(*[d + m + s.to_fixed(*[6])])
+        m = _math.floor(*[(val / 100.0 - d) * 100.0 / 60])
+        s = ((val / 100.0 - d) * 100.0 - m) * 60 / 60 * 60
+        return parse_float(*[((d + m) + s).to_fixed(*[6])])
 
     def nmea2s(self, val):
         val = parse_float(*[val])
         d = _math.floor(*[val / 100.0])
-        m = _math.floor(*[val / 100.0 - d * 100.0 / 60])
-        s = val / 100.0 - d * 100.0 - m * 60 / 60 * 60
-        return d + m + s / 1.0 / 60.0 / 60.0
+        m = _math.floor(*[(val / 100.0 - d) * 100.0 / 60])
+        s = ((val / 100.0 - d) * 100.0 - m) * 60 / 60 * 60
+        return ((d + m) + s) / 1.0 / 60.0 / 60.0

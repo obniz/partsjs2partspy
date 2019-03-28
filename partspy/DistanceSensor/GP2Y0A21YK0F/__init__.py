@@ -1,15 +1,17 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class GP2Y0A21YK0F:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'signal']
         self.required_keys = ['signal']
-        self.display_io_names = {'vcc': 'vcc', 'gnd': 'gnd', 'signal': 'signal'}
+        self.display_io_names = AttrDefault(bool, {'vcc': 'vcc', 'gnd': 'gnd', 'signal': 'signal'})
         self._unit = 'mm'
 
     @staticmethod
     def info():
-        return {'name': 'GP2Y0A21YK0F'}
+        return AttrDefault(bool, {'name': 'GP2Y0A21YK0F'})
 
     def wired(self, obniz):
         self.obniz = obniz

@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class KXSC7_2050:
@@ -7,7 +9,7 @@ class KXSC7_2050:
 
     @staticmethod
     def info():
-        return {'name': 'KXSC7-2050'}
+        return AttrDefault(bool, {'name': 'KXSC7-2050'})
 
     async def wired(self, obniz):
         self.obniz = obniz
@@ -20,8 +22,8 @@ class KXSC7_2050:
         pwrVoltage = await ad.get_wait()
         horizontalZ = await self.ad_z.get_wait()
         sensitivity = pwr_voltage / 5
-        offsetVoltage = horizontal_z - sensitivity
+        offsetVoltage = (horizontal_z - sensitivity)
         self = self
-        self.ad_x.start(*[lambda value: self.gravity = value - offset_voltage / sensitivity])
-        self.ad_y.start(*[lambda value: self.gravity = value - offset_voltage / sensitivity])
-        self.ad_z.start(*[lambda value: self.gravity = value - offset_voltage / sensitivity])
+        self.ad_x.start(*[lambda value: self.gravity = (value - offset_voltage) / sensitivity])
+        self.ad_y.start(*[lambda value: self.gravity = (value - offset_voltage) / sensitivity])
+        self.ad_z.start(*[lambda value: self.gravity = (value - offset_voltage) / sensitivity])

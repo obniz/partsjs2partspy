@@ -64,7 +64,7 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
 
     if stt["type"] == "ClassDeclaration":
         base = "" if stt["superClass"] is None else stt["superClass"]
-        with module.class_(get_expression(stt["id"]), bases=base):
+        with module.class_(stt["id"]["name"], bases=base):
             bodies = stt["body"]["body"]
             for body in bodies:
                 get_statement(body, module)
@@ -322,6 +322,7 @@ def get_expression(exp):
             get_expression(exp["right"]))
 
     if exp["type"] == "BinaryExpression":
+        # for string concatnation
         if ("+" in exp["operator"] and
             ("Literal" in exp["left"]["type"] and type(exp["left"]["value"]) is str)
             ):
@@ -338,6 +339,12 @@ def get_expression(exp):
             get_operator(exp["operator"]) +
             " " +
             get_expression(exp["right"]))
+
+        if get_operator(exp["operator"]) in ["+", "-"]:
+            return ("(" + get_expression(exp["left"]) +
+                    " " + get_operator(exp["operator"]) +
+                    " " + get_expression(exp["right"]) + ")")
+
         return (get_expression(exp["left"]) +
             " " +
             get_operator(exp["operator"]) +
@@ -409,8 +416,10 @@ def get_expression(exp):
             ")")
     
     if exp["type"] == "ObjectExpression":
-        obj = "{"
+        obj = "AttrDefault(bool, {"
         if "properties" in exp:
+            if len(exp["properties"]) == 0:
+                return "AttrDict({})"
             for prop in exp["properties"]:
                 if "'" in get_expression(prop["key"]) or '"' in get_expression(prop["key"]):
                     obj += (
@@ -422,7 +431,7 @@ def get_expression(exp):
                         "'" + get_expression(prop["key"]) + "': " +
                         get_expression(prop["value"]) + ", "
                     )
-            obj = obj[:-2] + "}"
+            obj = obj[:-2] + "})"
             return obj
 
     if exp["type"] == "ConditionalExpression":
@@ -524,6 +533,8 @@ if __name__ == "__main__":
             tmp = "import asyncio\n\n" + tmp
         if "datetime" in tmp:
             tmp = "import datetime\n\n" + tmp
+        if "AttrDefault" in tmp:
+            tmp = "from attrdict import AttrDefault\n\n" + tmp
         with open(part_json.parent/"__init__.py", mode="w") as f:
             f.write(tmp)
         print("===" + part_json.parent.name + " (" + str(num+1) + "/" + str(len(part_jsons)) + ") completed===")

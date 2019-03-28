@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class FSR40X:
@@ -7,7 +9,7 @@ class FSR40X:
 
     @staticmethod
     def info():
-        return {'name': 'FSR40X'}
+        return AttrDefault(bool, {'name': 'FSR40X'})
 
     def wired(self, obniz):
         self.obniz = obniz

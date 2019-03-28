@@ -1,4 +1,6 @@
-class _irsensor:
+from attrdict import AttrDefault
+
+class IRSensor:
     def __init__(self):
         self.keys = ['output', 'vcc', 'gnd']
         self.required_keys = ['output']
@@ -11,7 +13,7 @@ class _irsensor:
 
     @staticmethod
     def info():
-        return {'name': 'IRSensor'}
+        return AttrDefault(bool, {'name': 'IRSensor'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -23,5 +25,5 @@ class _irsensor:
         self.ondetect = callback
         if self.output_pullup:
             self.obniz.get_io(*[self.params.output]).pull(*['5v'])
-        self.obniz.logic_analyzer.start(*[{'io': self.params.output, 'interval': self.data_symbol_length, 'duration': self.duration, 'trigger_value': False if self.data_inverted else True, 'trigger_value_samples': self.trigger_sample_count}])
+        self.obniz.logic_analyzer.start(*[AttrDefault(bool, {'io': self.params.output, 'interval': self.data_symbol_length, 'duration': self.duration, 'trigger_value': False if self.data_inverted else True, 'trigger_value_samples': self.trigger_sample_count})])
         self.obniz.logic_analyzer.onmeasured = # TODO: ArrowFunctionExpression was here

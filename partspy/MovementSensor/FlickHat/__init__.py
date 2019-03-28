@@ -1,16 +1,18 @@
+from attrdict import AttrDefault
+
 import datetime
 
 import asyncio
 
-class _flick_hat:
+class FlickHat:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'sda', 'scl', 'reset', 'ts', 'led1', 'led2']
         self.required_keys = ['gnd', 'sda', 'scl', 'reset', 'ts']
-        self.display_io_names = {'sda': 'sda', 'scl': 'scl', 'gnd': 'gnd', 'reset': 'reset', 'ts': 'ts'}
+        self.display_io_names = AttrDefault(bool, {'sda': 'sda', 'scl': 'scl', 'gnd': 'gnd', 'reset': 'reset', 'ts': 'ts'})
 
     @staticmethod
     def info():
-        return {'name': 'FlickHat'}
+        return AttrDefault(bool, {'name': 'FlickHat'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -29,9 +31,9 @@ class _flick_hat:
         self.params.clock = 100 * 1000
         self.i2c = self.obniz.get_i2_cwith_config(*[self.params])
         if self.obniz.is_valid_io(*[self.params.led1]):
-            self.led1 = self.obniz.wired(*['LED', {'anode': self.params.led1}])
+            self.led1 = self.obniz.wired(*['LED', AttrDefault(bool, {'anode': self.params.led1})])
         if self.obniz.is_valid_io(*[self.params.led2]):
-            self.led2 = self.obniz.wired(*['LED', {'anode': self.params.led2}])
+            self.led2 = self.obniz.wired(*['LED', AttrDefault(bool, {'anode': self.params.led2})])
 
     async def start(self, callback_fw_info):
         self.io_ts.pull(*['3v'])
@@ -40,7 +42,7 @@ class _flick_hat:
         self.io_reset.output(*[True])
         await self.obniz.wait(*[50])
         self.onfwinfo = callback_fw_info
-        self.fw_info = {'fw_valid': 0, 'fw_info_received': False}
+        self.fw_info = AttrDefault(bool, {'fw_valid': 0, 'fw_info_received': False})
         self.rotation = 0
         self.last_rotation = 0
         self.read_size = 132
@@ -66,7 +68,7 @@ class _flick_hat:
         sysAirWheelValid = 1 << 1
         startTime = datetime.datetime.now()
         ts = True
-        while ts and datetime.datetime.now() - start_time < timeout:
+        while ts and (datetime.datetime.now() - start_time) < timeout:
             ts = await self.io_ts.input_wait()
         if not ts:
             self.io_ts.pull(*['0v'])
@@ -93,7 +95,7 @@ class _flick_hat:
                     if gesture[0] == 255 and gesture[1] == 255 and gesture[2] == 255 and gesture[3] == 255:
                         break
                     if configmask and mask_xyzposition and sysinfo and sys_position_valid:
-                        xyz = {'x': data[20] or data[21] << 8 / 65536, 'y': data[22] or data[23] << 8 / 65536, 'z': data[24] or data[25] << 8 / 65536, 'seq': seq}
+                        xyz = AttrDefault(bool, {'x': data[20] or data[21] << 8 / 65536, 'y': data[22] or data[23] << 8 / 65536, 'z': data[24] or data[25] << 8 / 65536, 'seq': seq})
                         self.xyz = xyz
                         if type(self.onxyz) == 'function':
                             self.onxyz(*[xyz])
@@ -102,9 +104,9 @@ class _flick_hat:
                         gestures = [['', '', ''], ['garbage', '', ''], ['flick', 'west', 'east'], ['flick', 'east', 'west'], ['flick', 'south', 'north'], ['flick', 'north', 'south'], ['circle', 'clockwise', ''], ['circle', 'counter-clockwise', ''][], ['wave', 'y', ''], ['hold', '', '']]
                         for index, _ in enumerate(gestures):
                             if index == gesture[0] and type(self.ongestureall) == 'function':
-                                self.ongestureall(*[{'action': gestures[index][0], 'from': gestures[index][1], 'to': gestures[index][2], 'raw': gesture, 'seq': seq}])
+                                self.ongestureall(*[AttrDefault(bool, {'action': gestures[index][0], 'from': gestures[index][1], 'to': gestures[index][2], 'raw': gesture, 'seq': seq})])
                             if index == gesture[0] and gestures[index][0] == 'flick' and type(self.ongesture) == 'function':
-                                self.ongesture(*[{'action': 'gesture', 'from': gestures[index][1], 'to': gestures[index][2], 'raw': gesture, 'seq': seq}])
+                                self.ongesture(*[AttrDefault(bool, {'action': 'gesture', 'from': gestures[index][1], 'to': gestures[index][2], 'raw': gesture, 'seq': seq})])
                     if configmask and mask_touch_info and not touch[0] == 0 and touch[1] == 0 and touch[3] == 0:
                         touchAction = touch[0] or touch[1] << 8
                         if touch_action == 0xffff:
@@ -128,26 +130,26 @@ class _flick_hat:
 
                             comp <<= 1
                         if touches.length > 0 and type(self.ontouch) == 'function':
-                            self.ontouch(*[{'action': 'touch', 'positions': touches, 'raw': touch, 'seq': seq}])
+                            self.ontouch(*[AttrDefault(bool, {'action': 'touch', 'positions': touches, 'raw': touch, 'seq': seq})])
                         if taps.length > 0 and type(self.ontap) == 'function':
-                            self.ontap(*[{'action': 'tap', 'positions': taps, 'raw': touch, 'seq': seq}])
+                            self.ontap(*[AttrDefault(bool, {'action': 'tap', 'positions': taps, 'raw': touch, 'seq': seq})])
                         if doubletaps.length > 0 and type(self.ondoubletap) == 'function':
-                            self.ondoubletap(*[{'action': 'doubletap', 'positions': doubletaps, 'raw': touch, 'seq': seq}])
+                            self.ondoubletap(*[AttrDefault(bool, {'action': 'doubletap', 'positions': doubletaps, 'raw': touch, 'seq': seq})])
                     if configmask and mask_air_wheel_info and sysinfo and sys_air_wheel_valid:
-                        delta = airwheel[0] - self.last_rotation / 32.0
+                        delta = (airwheel[0] - self.last_rotation) / 32.0
                         self.rotation += delta * 360.0
                         self.rotation %= 360
                         if delta != 0 and delta > -0.5 and delta < 0.5:
                             if type(self.onairwheel) == 'function':
-                                self.onairwheel(*[{'delta': delta * 360.0, 'rotation': self.rotation, 'raw': airwheel, 'seq': seq}])
+                                self.onairwheel(*[AttrDefault(bool, {'delta': delta * 360.0, 'rotation': self.rotation, 'raw': airwheel, 'seq': seq})])
                         self.last_rotation = airwheel[0]
                 elif msg_id==0x15:
-                    status_info = {'msg_id': data[4], 'max_cmd_size': data[5], 'error': data[6] or data[7] << 8}
+                    status_info = AttrDefault(bool, {'msg_id': data[4], 'max_cmd_size': data[5], 'error': data[6] or data[7] << 8})
                     self.status_info = status_info
                     if self.debugprint or self.obniz.debugprint:
                         console.log(*["flickHat: system status: {msgId: " + status_info.msg_id + ", maxCmdSize: " + status_info.max_cmd_size + ", error: " + status_info.error + "}"])
                 elif msg_id==0x83:
-                    fw_info = {'fw_valid': data[4] == 0xaa, 'hw_rev': [data[5], data[6]], 'param_start_addr': data[7] * 128, 'lib_loader_ver': [data[8], data[9]], 'lib_loader_platform': data[10], 'fw_start_addr': data[11] * 128, 'fw_version': self._data_array2string(*[data.slice(*[12, 132])]).split(*['\0'])[0], 'fw_info_received': True}
+                    fw_info = AttrDefault(bool, {'fw_valid': data[4] == 0xaa, 'hw_rev': [data[5], data[6]], 'param_start_addr': data[7] * 128, 'lib_loader_ver': [data[8], data[9]], 'lib_loader_platform': data[10], 'fw_start_addr': data[11] * 128, 'fw_version': self._data_array2string(*[data.slice(*[12, 132])]).split(*['\0'])[0], 'fw_info_received': True})
                     self.fw_info = fw_info
                     if type(self.onfwinfo) == 'function':
                         self.onfwinfo(*[fw_info])

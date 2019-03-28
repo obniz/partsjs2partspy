@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 class RN42:
     def __init__(self):
         self.keys = ['tx', 'rx', 'gnd']
@@ -5,13 +7,13 @@ class RN42:
 
     @staticmethod
     def info():
-        return {'name': 'RN42'}
+        return AttrDefault(bool, {'name': 'RN42'})
 
     def wired(self, obniz):
         if obniz.is_valid_io(*[self.params.gnd]):
             obniz.get_io(*[self.params.gnd]).output(*[False])
         self.uart = obniz.get_free_uart()
-        self.uart.start(*[{'tx': self.params.tx, 'rx': self.params.rx, 'baud': 115200, 'drive': '3v'}])
+        self.uart.start(*[AttrDefault(bool, {'tx': self.params.tx, 'rx': self.params.rx, 'baud': 115200, 'drive': '3v'})])
         self = self
         self.uart.onreceive = # TODO: ArrowFunctionExpression was here
 

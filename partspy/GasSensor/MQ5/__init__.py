@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class MQ5:
@@ -11,7 +13,7 @@ class MQ5:
 
     @staticmethod
     def info():
-        return {'name': 'MQ5'}
+        return AttrDefault(bool, {'name': 'MQ5'})
 
     def wired(self, obniz):
         self.obniz = obniz

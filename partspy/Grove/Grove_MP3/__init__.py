@@ -1,16 +1,18 @@
+from attrdict import AttrDefault
+
 import asyncio
 
-class _grove__mp3:
+class Grove_MP3:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'mp3_rx', 'mp3_tx']
         self.required_keys = ['mp3_rx', 'mp3_tx']
         self.io_keys = self.keys
         self.display_name = 'MP3'
-        self.display_io_names = {'mp3_rx': 'MP3Rx', 'mp3_tx': 'MP3Tx'}
+        self.display_io_names = AttrDefault(bool, {'mp3_rx': 'MP3Rx', 'mp3_tx': 'MP3Tx'})
 
     @staticmethod
     def info():
-        return {'name': 'Grove_MP3'}
+        return AttrDefault(bool, {'name': 'Grove_MP3'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -20,7 +22,7 @@ class _grove__mp3:
         self.uart = self.obniz.get_free_uart()
 
     async def init_wait(self, strage):
-        self.uart.start(*[{'tx': self.my_tx, 'rx': self.my_rx, 'baud': 9600}])
+        self.uart.start(*[AttrDefault(bool, {'tx': self.my_tx, 'rx': self.my_rx, 'baud': 9600})])
         await self.obniz.wait(*[100])
         self.uart_send(*[0x0c, 0])
         await self.obniz.wait(*[500])

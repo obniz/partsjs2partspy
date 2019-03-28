@@ -1,6 +1,8 @@
+from attrdict import AttrDefault
+
 import datetime
 
-class _7_segment_ledarray:
+class _7SegmentLEDArray:
     def __init__(self):
         self.identifier = '' + str(datetime.datetime.now().get_time())
         self.keys = ['segments']
@@ -8,7 +10,7 @@ class _7_segment_ledarray:
 
     @staticmethod
     def info():
-        return {'name': '7SegmentLEDArray'}
+        return AttrDefault(bool, {'name': '7SegmentLEDArray'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -20,7 +22,7 @@ class _7_segment_ledarray:
             print = # TODO: ArrowFunctionExpression was here
             animations = []
             for i in range(0, self.segments.length, 1):
-                animations.push(*[{'duration': 3, 'state': print}])
+                animations.push(*[AttrDefault(bool, {'duration': 3, 'state': print})])
             self.obniz.io.animation(*[self.identifier, 'loop', animations])
 
     def on(self):

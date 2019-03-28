@@ -1,14 +1,16 @@
+from attrdict import AttrDefault
+
 import asyncio
 
-class _xbee:
+class XBee:
     def __init__(self):
         self.keys = ['tx', 'rx', 'gnd']
         self.required_keys = ['tx', 'rx']
-        self.display_io_names = {'tx': '<tx', 'rx': '>rx'}
+        self.display_io_names = AttrDefault(bool, {'tx': '<tx', 'rx': '>rx'})
 
     @staticmethod
     def info():
-        return {'name': 'XBee'}
+        return AttrDefault(bool, {'name': 'XBee'})
 
     def wired(self, obniz):
         self.uart = obniz.get_free_uart()
@@ -18,7 +20,7 @@ class _xbee:
         self.on_finish_at_mode_callback = null
         if type(self.params.gnd) == 'number':
             obniz.get_io(*[self.params.gnd]).output(*[False])
-        self.uart.start(*[{'tx': self.params.tx, 'rx': self.params.rx, 'baud': 9600, 'drive': '3v'}])
+        self.uart.start(*[AttrDefault(bool, {'tx': self.params.tx, 'rx': self.params.rx, 'baud': 9600, 'drive': '3v'})])
         self.uart.onreceive = # TODO: failed to generate Function Expression
 
     def send(self, text):
@@ -47,7 +49,7 @@ class _xbee:
             next()
 
     def add_command(self, command, value):
-        str = command + ' ' + str(value) if value else ''
+        str = (command + ' ' + str(value) if value else '')
         self.commands.push(*[str])
         if self.is_at_mode == True and self.current_command == null:
             self.send_command()

@@ -1,4 +1,6 @@
-class _snx4_hc595:
+from attrdict import AttrDefault
+
+class SNx4HC595:
     def __init__(self):
         self.keys = ['gnd', 'vcc', 'ser', 'srclk', 'rclk', 'oe', 'srclr', 'io_num', 'enabled']
         self.required_keys = ['ser', 'srclk', 'rclk']
@@ -6,7 +8,7 @@ class _snx4_hc595:
 
     @staticmethod
     def info():
-        return {'name': 'SNx4HC595'}
+        return AttrDefault(bool, {'name': 'SNx4HC595'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -34,7 +36,7 @@ class _snx4_hc595:
             self.io_oe.output(*[False])
 
     def io_num(self, num):
-        class _snx4_hc595__io:
+        class SNx4HC595_IO:
             def __init__(self, chip, id):
                 self.chip = chip
                 self.id = id
@@ -83,7 +85,7 @@ class _snx4_hc595:
 
     def flush(self):
         self.io_rclk.output(*[False])
-        for i in range(self.io.length - 1, 0 - 1, -1):
+        for i in range((self.io.length - 1), 0 - 1, -1):
             self.io_ser.output(*[self.io[i].value])
             self.io_srclk.output(*[True])
             self.io_srclk.output(*[False])

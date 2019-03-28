@@ -1,8 +1,10 @@
-class _sharp_memory_tft:
+from attrdict import AttrDefault
+
+class SharpMemoryTFT:
     def __init__(self):
         self.keys = ['vcc', 'gnd', 'vcc_a', 'gnd_a', 'sclk', 'mosi', 'cs', 'disp', 'extcomin', 'extmode', 'width', 'height']
         self.required_keys = ['sclk', 'mosi', 'cs', 'width', 'height']
-        self.commands = }
+        self.commands = AttrDict({})
         self.commands.write = 0x80
         self.commands.clear = 0x20
         self.commands.vcom = 0x40
@@ -11,7 +13,7 @@ class _sharp_memory_tft:
 
     @staticmethod
     def info():
-        return {'name': 'SharpMemoryTFT'}
+        return AttrDefault(bool, {'name': 'SharpMemoryTFT'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -63,7 +65,7 @@ class _sharp_memory_tft:
         self.io_cs.output(*[True])
         for i in range(0, totalbytes, 1):
             array[] = raw_data[i]
-            currentline = parse_int(*[i + 1 / self.width / 8 + 1, 10])
+            currentline = parse_int(*[((i + 1) / self.width / 8 + 1), 10])
             if currentline != oldline:
                 array[] = 0x00
                 if currentline <= self.height:
@@ -79,7 +81,7 @@ class _sharp_memory_tft:
         self.io_cs.output(*[False])
 
     def _reset(self):
-        self._pos = {'x': 0, 'y': 0}
+        self._pos = AttrDefault(bool, {'x': 0, 'y': 0})
         self.auto_flush = True
 
     def warn_canvas_availability(self):
@@ -129,7 +131,7 @@ class _sharp_memory_tft:
         if type(font) != 'string':
             font = 'Arial'
         self.font_size = size
-        ctx.font = str('' + str(+' ') + size) + 'px ' + font
+        ctx.font = (str(('' + str(+' ') + size)) + 'px ' + font)
 
     def clear(self):
         ctx = self._ctx()
@@ -155,7 +157,7 @@ class _sharp_memory_tft:
     def print(self, text):
         ctx = self._ctx()
         if ctx:
-            ctx.fill_text(*[text, self._pos.x, self._pos.y + self.font_size])
+            ctx.fill_text(*[text, self._pos.x, (self._pos.y + self.font_size)])
             self.draw(*[ctx])
             self._pos.y += self.font_size
         else:
@@ -202,15 +204,15 @@ class _sharp_memory_tft:
         imageData = ctx.get_image_data(*[0, 0, self.width, self.height])
         data = image_data.data
         for i in range(0, data.length, 4):
-            brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]
+            brightness = ((0.34 * data[i] + 0.5 * data[(i + 1)]) + 0.16 * data[(i + 2)])
             index = parse_int(*[i / 4])
             line = parse_int(*[index / self.width])
-            col = parse_int(*[index - line * self.width / 8])
-            bits = parse_int(*[index - line * self.width]) % 8
+            col = parse_int(*[(index - line * self.width) / 8])
+            bits = parse_int(*[(index - line * self.width)]) % 8
             if bits == 0:
-                vram[line * stride + col] = 0x00
+                vram[(line * stride + col)] = 0x00
             if brightness > 0x73:
-                vram[line * stride + col] |= 0x80 >> bits
+                vram[(line * stride + col)] |= 0x80 >> bits
         self.raw(*[vram])
 
     def draw(self, ctx):

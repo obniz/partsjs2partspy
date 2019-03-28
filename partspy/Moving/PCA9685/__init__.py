@@ -1,9 +1,11 @@
+from attrdict import AttrDefault
+
 class PCA9685:
     def __init__(self):
         self.keys = ['gnd', 'vcc', 'scl', 'sda', 'oe', 'i2c', 'enabled', 'address', 'drive']
         self.required_keys = []
         self.address = 0x40
-        self._commands = {'MODE1': 0x00, 'MODE2': 0x01, 'SUBADR1': 0x02, 'SUBADR2': 0x03, 'SUBADR3': 0x04, 'PRESCALE': 0xfe, 'LED0_ON_L': 0x06, 'ALL_LED_ON_L': 0xfa, 'bits': {'ALLCALL': 0x01, 'SLEEP_ENABLE': 0x10, 'AUTO_INCREMENT_ENABLED': 0x20, 'RESTART': 0x80, 'OUTDRV': 0x04, 'INVRT': 0x10}}
+        self._commands = AttrDefault(bool, {'MODE1': 0x00, 'MODE2': 0x01, 'SUBADR1': 0x02, 'SUBADR2': 0x03, 'SUBADR3': 0x04, 'PRESCALE': 0xfe, 'LED0_ON_L': 0x06, 'ALL_LED_ON_L': 0xfa, 'bits': AttrDefault(bool, {'ALLCALL': 0x01, 'SLEEP_ENABLE': 0x10, 'AUTO_INCREMENT_ENABLED': 0x20, 'RESTART': 0x80, 'OUTDRV': 0x04, 'INVRT': 0x10})})
         self._regs = [0] * 1
         self.pwm_num = 16
         self.pwms = []
@@ -11,7 +13,7 @@ class PCA9685:
 
     @staticmethod
     def info():
-        return {'name': 'PCA9685'}
+        return AttrDefault(bool, {'name': 'PCA9685'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -46,7 +48,7 @@ class PCA9685:
                 self.chip = chip
                 self.id = id
                 self.value = 0
-                self.state = }
+                self.state = AttrDict({})
 
             def freq(self, frequency):
                 self.chip.freq(*[frequency])
@@ -80,7 +82,7 @@ class PCA9685:
         prescaleval /= 4096.0
         prescaleval /= frequency * 0.9
         prescaleval -= 1.0
-        prescale = parse_int(*[_math.floor(*[prescaleval + 0.5])])
+        prescale = parse_int(*[_math.floor(*[(prescaleval + 0.5)])])
         mode1 = self._regs[self._commands.MODE1]
         self.i2c.write(*[self.address, [self._commands.MODE1, mode1 and 0x7f or self._commands.bits.SLEEP_ENABLE]])
         self.i2c.write(*[self.address, [self._commands.PRESCALE, prescale]])
@@ -109,7 +111,7 @@ class PCA9685:
         self.write_single_onoff(*[id, 0, duty / 100.0 * 4095])
 
     def write_single_onoff(self, id, on, off):
-        self.i2c.write(*[self.address, [self._commands.LED0_ON_L + 4 * id, on and 0xff, on >> 8, off and 0xff, off >> 8]])
+        self.i2c.write(*[self.address, [(self._commands.LED0_ON_L + 4 * id), on and 0xff, on >> 8, off and 0xff, off >> 8]])
 
     def set_enable(self, enable):
         if not self.io_oe and enable == False:

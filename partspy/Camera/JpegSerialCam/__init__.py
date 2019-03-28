@@ -1,16 +1,18 @@
+from attrdict import AttrDefault
+
 import asyncio
 
-class _jpeg_serial_cam:
+class JpegSerialCam:
     def __init__(self):
         self.keys = ['vcc', 'cam_tx', 'cam_rx', 'gnd']
         self.required_keys = ['cam_tx', 'cam_rx']
         self.io_keys = self.keys
         self.display_name = 'Jcam'
-        self.display_io_names = {'cam_tx': 'camTx', 'cam_rx': 'camRx'}
+        self.display_io_names = AttrDefault(bool, {'cam_tx': 'camTx', 'cam_rx': 'camRx'})
 
     @staticmethod
     def info():
-        return {'name': 'JpegSerialCam'}
+        return AttrDefault(bool, {'name': 'JpegSerialCam'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -38,7 +40,7 @@ class _jpeg_serial_cam:
             if src[i] == search[f]:
 
                 if f == search.length:
-                    return i + 1
+                    return (i + 1)
             else:
                 f = 0
         return -1
@@ -48,8 +50,8 @@ class _jpeg_serial_cam:
 
     async def start_wait(self, obj):
         if not obj:
-            obj = }
-        self.uart.start(*[{'tx': self.my_tx, 'rx': self.my_rx, 'baud': obj.baud or 38400}])
+            obj = AttrDict({})
+        self.uart.start(*[AttrDefault(bool, {'tx': self.my_tx, 'rx': self.my_rx, 'baud': obj.baud or 38400})])
         self.obniz.display.set_pin_name(*[self.my_tx, 'JpegSerialCam', 'camRx'])
         self.obniz.display.set_pin_name(*[self.my_rx, 'JpegSerialCam', 'camTx'])
         await self.obniz.wait(*[2500])
@@ -95,7 +97,7 @@ class _jpeg_serial_cam:
             raise Exception('invalid baud rate')
         self.uart.send(*[[0x56, 0x00, 0x31, 0x06, 0x04, 0x02, 0x00, 0x08, val[0], val[1]]])
         await self._drain_until(*[self.uart, [0x76, 0x00, 0x31, 0x00]])
-        await self.startwait(*[{'baud': baud}])
+        await self.startwait(*[AttrDefault(bool, {'baud': baud})])
 
     async def take_wait(self):
         uart = self.uart
@@ -115,7 +117,7 @@ class _jpeg_serial_cam:
                 YY = recv[1]
                 break
             await self.obniz.wait(*[1000])
-        databytes = XX * 256 + YY
+        databytes = (XX * 256 + YY)
         uart.send(*[[0x56, 0x00, 0x32, 0x0c, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, XX, YY, 0x00, 0xff]])
         recv = await self._drain_until(*[uart, [0x76, 0x00, 0x32, 0x00, 0x00]])
         while True:

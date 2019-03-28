@@ -1,6 +1,8 @@
+from attrdict import AttrDefault
+
 import asyncio
 
-class _button:
+class Button:
     def __init__(self):
         self.keys = ['signal', 'gnd']
         self.required = ['signal']
@@ -8,7 +10,7 @@ class _button:
 
     @staticmethod
     def info():
-        return {'name': 'Button'}
+        return AttrDefault(bool, {'name': 'Button'})
 
     def wired(self, obniz):
         self.io_signal = obniz.get_io(*[self.params.signal])

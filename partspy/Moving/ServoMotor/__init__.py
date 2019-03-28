@@ -1,12 +1,14 @@
-class _servo_motor:
+from attrdict import AttrDefault
+
+class ServoMotor:
     def __init__(self):
         self.keys = ['gnd', 'vcc', 'signal', 'pwm']
         self.required_keys = []
-        self.range = {'min': 0.5, 'max': 2.4}
+        self.range = AttrDefault(bool, {'min': 0.5, 'max': 2.4})
 
     @staticmethod
     def info():
-        return {'name': 'ServoMotor'}
+        return AttrDefault(bool, {'name': 'ServoMotor'})
 
     def wired(self, obniz):
         self.obniz = obniz
@@ -18,13 +20,13 @@ class _servo_motor:
         else:
             self.pwm = obniz.get_free_pwm()
             self.pwm_io_num = self.params.signal
-            self.pwm.start(*[{'io': self.pwm_io_num}])
+            self.pwm.start(*[AttrDefault(bool, {'io': self.pwm_io_num})])
         self.pwm.freq(*[50])
 
     def angle(self, ratio):
         max = self.range.max
         min = self.range.min
-        val = max - min * ratio / 180.0 + min
+        val = ((max - min) * ratio / 180.0 + min)
         self.pwm.pulse(*[val])
 
     def on(self):

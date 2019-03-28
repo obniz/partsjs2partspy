@@ -1,21 +1,23 @@
-class _dcmotor:
+from attrdict import AttrDefault
+
+class DCMotor:
     def __init__(self):
         self.keys = ['forward', 'back']
         self.required_keys = ['forward', 'back']
 
     @staticmethod
     def info():
-        return {'name': 'DCMotor'}
+        return AttrDefault(bool, {'name': 'DCMotor'})
 
     def wired(self, obniz):
-        self.status = {'direction': null, 'power': null}
+        self.status = AttrDefault(bool, {'direction': null, 'power': null})
         self.pwm1_io_num = self.params.forward
         self.pwm2_io_num = self.params.back
         self.pwm1 = obniz.get_free_pwm()
-        self.pwm1.start(*[{'io': self.pwm1_io_num}])
+        self.pwm1.start(*[AttrDefault(bool, {'io': self.pwm1_io_num})])
         self.pwm1.freq(*[100000])
         self.pwm2 = obniz.get_free_pwm()
-        self.pwm2.start(*[{'io': self.pwm2_io_num}])
+        self.pwm2.start(*[AttrDefault(bool, {'io': self.pwm2_io_num})])
         self.pwm2.freq(*[100000])
         self.power(*[30])
 

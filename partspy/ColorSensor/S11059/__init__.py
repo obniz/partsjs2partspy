@@ -1,3 +1,5 @@
+from attrdict import AttrDefault
+
 import asyncio
 
 class S11059:
@@ -5,14 +7,14 @@ class S11059:
         self.keys = ['vcc', 'sda', 'scl', 'i2c', 'gnd']
         self.required_keys = []
         self.address = 0x2a
-        self.reg_adrs = }
+        self.reg_adrs = AttrDict({})
         self.reg_adrs.ctrl = 0x00
         self.reg_adrs.manual_timing = 0x01
         self.reg_adrs.sensor_red = 0x03
 
     @staticmethod
     def info():
-        return {'name': 'S11059'}
+        return AttrDefault(bool, {'name': 'S11059'})
 
     def wired(self, obniz):
         self.obniz = obniz

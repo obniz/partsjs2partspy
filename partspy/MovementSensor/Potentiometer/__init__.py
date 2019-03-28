@@ -1,4 +1,6 @@
-class _potentiometer:
+from attrdict import AttrDefault
+
+class Potentiometer:
     def __init__(self):
         self.keys = ['pin0', 'pin1', 'pin2']
         self.reuired_keys = ['pin0', 'pin1', 'pin2']
@@ -6,7 +8,7 @@ class _potentiometer:
 
     @staticmethod
     def info():
-        return {'name': 'Potentiometer'}
+        return AttrDefault(bool, {'name': 'Potentiometer'})
 
     def wired(self, obniz):
         self.obniz.set_vcc_gnd(*[self.params.pin0, self.params.pin2, '5v'])
