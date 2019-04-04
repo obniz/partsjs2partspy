@@ -354,6 +354,8 @@ def get_expression(exp):
         return snake(exp["name"])
 
     if exp["type"] == "Literal":
+        if exp["raw"] == "null":
+            return "None"
         return exp["raw"]
     
     if exp["type"] == "CallExpression":
@@ -455,9 +457,9 @@ def get_operator(ope):
         return "=="
     if ope == "!==":
         return "!="
-    if ope == "||" or ope == "|":
+    if ope == "||":
         return "or"
-    if ope == "&&" or ope == "&":
+    if ope == "&&":
         return "and"
     return ope
 
