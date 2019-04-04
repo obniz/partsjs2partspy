@@ -466,7 +466,7 @@ def get_operator(ope):
 if __name__ == "__main__":
 
     file_path = pathlib.Path(__file__).parent
-    part_jsons = list(file_path.glob("**/index.json"))
+    part_jsons = list(file_path.glob("**/index.json", reccurent=True))
     if args.file:
         part_jsons = [part for part in part_jsons if args.file in str(part)]
     for num, part_json in enumerate(part_jsons):
