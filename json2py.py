@@ -139,10 +139,10 @@ def get_statement(stt, module, replace_from="_DummyString_", replace_to=""):
     if stt["type"] == "VariableDeclaration":
         for dec in stt["declarations"]:
             if dec["init"]:
-                module.stmt(dec["id"]["name"] +
+                module.stmt(get_expression(dec["id"]) +
                             " = " + get_expression(dec["init"]))
             else:
-                module.stmt(dec["id"]["name"] + " = None")
+                module.stmt(get_expression(dec["id"]) + " = None")
         return
 
     if stt["type"] == "WhileStatement":
