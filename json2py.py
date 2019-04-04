@@ -379,7 +379,7 @@ def get_expression(exp):
         obj = "AttrDefault(bool, {"
         if "properties" in exp:
             if len(exp["properties"]) == 0:
-                return "AttrDedfault(bool, {})"
+                return "AttrDefault(bool, {})"
             for prop in exp["properties"]:
                 if "'" in get_expression(prop["key"]) or '"' in get_expression(prop["key"]):
                     obj += (
