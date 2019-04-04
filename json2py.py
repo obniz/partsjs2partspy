@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import glob
 import pathlib
 import argparse
 
@@ -466,12 +467,13 @@ def get_operator(ope):
 if __name__ == "__main__":
 
     file_path = pathlib.Path(__file__).parent
-    part_jsons = list(file_path.glob("**/index.json", reccurent=True))
+    # part_jsons = list(file_path.glob("**/index.json", recursive=True))
+    part_jsons = glob.glob(str(file_path / "**/index.json"), recursive=True)
     if args.file:
         part_jsons = [part for part in part_jsons if args.file in str(part)]
     for num, part_json in enumerate(part_jsons):
         m = PythonModule()
-        print("===start to generate " + str(part_json.parent) + "===")
+        print("===start to generate " + str(pathlib.Path(part_json).parent) + "===")
         with open(part_json) as f:
             js = json.load(f)
         #### process ###
@@ -488,6 +490,6 @@ if __name__ == "__main__":
             tmp = "import datetime\n\n" + tmp
         if "AttrDefault" in tmp:
             tmp = "from attrdict import AttrDefault\n\n" + tmp
-        with open(part_json.parent/"__init__.py", mode="w") as f:
+        with open(pathlib.Path(part_json).parent/"__init__.py", mode="w") as f:
             f.write(tmp)
-        print("===" + part_json.parent.name + " (" + str(num+1) + "/" + str(len(part_jsons)) + ") completed===")
+        print("===" + pathlib.Path(part_json).parent.name + " (" + str(num+1) + "/" + str(len(part_jsons)) + ") completed===")
