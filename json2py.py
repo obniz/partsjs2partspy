@@ -379,7 +379,7 @@ def get_expression(exp):
         obj = "AttrDefault(bool, {"
         if "properties" in exp:
             if len(exp["properties"]) == 0:
-                return "AttrDict({})"
+                return "AttrDedfault(bool, {})"
             for prop in exp["properties"]:
                 if "'" in get_expression(prop["key"]) or '"' in get_expression(prop["key"]):
                     obj += (
@@ -477,11 +477,14 @@ if __name__ == "__main__":
         with open(part_json) as f:
             js = json.load(f)
         #### process ###
-        parts_class = js["body"][0]
-        if parts_class["type"] != "ClassDeclaration":
-            raise Exception("Failed to generate python file.")
-
-        get_statement(parts_class, m)
+        # parts_class = js["body"][0]
+        # if parts_class["type"] != "ClassDeclaration":
+        #     raise Exception("Failed to generate python file.")
+        for stmt in js["body"]:
+            if stmt["type"] == "IfStatement":
+                break
+            else:
+                get_statement(stmt, m)
         
         tmp = str(m).replace("true", "True").replace("false", "False")  
         if "async" in tmp or "await" in tmp:
