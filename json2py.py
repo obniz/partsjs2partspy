@@ -305,7 +305,7 @@ def get_expression(exp):
                     ") " + get_operator(exp["operator"]) +
                     " " + get_expression(exp["right"]))
 
-        if get_operator(exp["operator"]) in ["+", "-"]:
+        if get_operator(exp["operator"]) in ["+", "-", ">>", "<<"]:
             return ("(" + get_expression(exp["left"]) +
                     " " + get_operator(exp["operator"]) +
                     " " + get_expression(exp["right"]) + ")")
