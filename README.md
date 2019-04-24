@@ -12,7 +12,7 @@ JS製obnizパーツライブラリをpythonのコードへと変換するプロ�
         - ex) `--file HC-SR505`によって`partspy/MovementSensor/HC-SR505`のみを対象とします
 
 ## note
-### 無名関数
+<!-- ### 無名関数
 無名関数はうまく変換することができません．
 ```JavaScript
     // JS
@@ -39,7 +39,7 @@ JS製obnizパーツライブラリをpythonのコードへと変換するプロ�
             return 0
         return position
     callback = retpos
-```
+``` -->
 
 ### Promise
 Promiseによるブロックはうまく変換することができません．  
