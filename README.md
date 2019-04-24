@@ -11,8 +11,8 @@ JS製obnizパーツライブラリをpythonのコードへと変換するプロ�
         - ex) `--file MovementSensor`によって`partspy/MovementSensor`のみを対象とします
         - ex) `--file HC-SR505`によって`partspy/MovementSensor/HC-SR505`のみを対象とします
 
-## note
-<!-- ### 無名関数
+<!-- ## note
+### 無名関数
 無名関数はうまく変換することができません．
 ```JavaScript
     // JS
@@ -39,11 +39,12 @@ JS製obnizパーツライブラリをpythonのコードへと変換するプロ�
             return 0
         return position
     callback = retpos
-``` -->
+```
 
 ### Promise
 Promiseによるブロックはうまく変換することができません．  
 asyncioのFutureを使用することで同値の変換を行えます．
+-->
 
 ## prestring
 asyncioに対応するため多少改変した[podhmo/prestring](https://github.com/podhmo/prestring)を用いてpythonへのコード変換を行なっています．  

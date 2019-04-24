@@ -23,6 +23,7 @@ class JsonToPy:
         self.func_names = []
         self.func_args = []
         self.func_count = 0
+        self.promise_flag = False
         for stmt in ast_json["body"]:
             if stmt["type"] == "IfStatement":
                 break
@@ -48,6 +49,7 @@ class JsonToPy:
                                 ", " + self.get_expression(attr["key"]) + ")")
                     self.m.stmt(statements)
                 return
+            self.funcs = []
             self.func_flag = False
             self.get_expression(exp)
             if self.func_flag:
@@ -98,6 +100,14 @@ class JsonToPy:
         if stt["type"] == "ReturnStatement":
             exp = stt["argument"]
             if exp:
+                self.promise_flag = False
+                self.funcs = []
+                self.func_flag = False
+                self.get_expression(exp)
+                if self.promise_flag:
+                    self.m.stmt("future = asyncio.get_event_loop().create_future()")
+                if self.func_flag:
+                    self.create_funcs()
                 self.m.stmt("return " + self.get_expression(exp))
             else:
                 self.m.stmt("return")
@@ -157,10 +167,10 @@ class JsonToPy:
         if stt["type"] == "VariableDeclaration":
             for dec in stt["declarations"]:
                 if dec["init"]:
+                    self.funcs = []
                     self.func_flag = False
                     self.get_expression(dec["init"])
                     if self.func_flag:
-                        # print("find annonymus func:")
                         self.create_funcs()
                     self.m.stmt(self.get_expression(dec["id"]) +
                                 " = " + self.get_expression(dec["init"]))
@@ -279,11 +289,11 @@ class JsonToPy:
             return self.snake(exp["name"])
 
         if exp["type"] == "FunctionExpression":
-            self.func_flag = True
-            self.funcs.append(exp)
             if self.func_names:
                 return self.func_names.pop(0)
             else:
+                self.func_flag = True
+                self.funcs.append(exp)
                 return ""
             # anonymous function
             # 現時点で単純な処理をするものにしか対応できていない
@@ -300,11 +310,11 @@ class JsonToPy:
 
 
         if exp["type"] == "ArrowFunctionExpression":
-            self.func_flag = True
-            self.funcs.append(exp)
             if self.func_names:
                 return self.func_names.pop(0)
             else:
+                self.func_flag = True
+                self.funcs.append(exp)
                 return ""
             # try:
             #     params = ""
@@ -397,17 +407,23 @@ class JsonToPy:
         
         if exp["type"] == "CallExpression":
             if not exp["arguments"]:
-                return (self.get_expression(exp["callee"]) + "()")
-            listr = "["
-            for arg in exp["arguments"]:
-                listr += self.get_expression(arg) + ", "
-            listr = listr[:-2] + "]"
+                listr = "[]"
+            else:
+                listr = "["
+                for arg in exp["arguments"]:
+                    listr += self.get_expression(arg) + ", "
+                listr = listr[:-2] + "]"
             # bindに対する特例処理
             if (exp["callee"]["type"] == "MemberExpression" and
                 "name" in exp["callee"]["property"] and
                 exp["callee"]["property"]["name"] == "bind"):
                 return self.get_expression(exp["callee"])
-
+            # resolveに対する特例処理
+            elif self.get_expression(exp["callee"]) == "resolve":
+                if exp["arguments"]:
+                    return "future.set_result(*" + listr + ")"
+                else:
+                    return "future.set_result()"
             return (self.get_expression(exp["callee"]) + 
                     "(*" + listr + ")")
         
@@ -447,7 +463,10 @@ class JsonToPy:
                     return self.get_expression(exp["arguments"][0])
                 return "[]"
             elif exp["callee"]["name"] == "Promise":
-                return "await" + self.get_expression(exp["arguments"][0])
+                self.promise_flag = True
+                    
+                # return "await" + self.get_expression(exp["arguments"][0])
+                return self.get_expression(exp["arguments"][0]) + "()"
             elif exp["callee"]["name"] == "Date":
                 return "datetime.datetime.now()"
             else:
@@ -504,13 +523,26 @@ class JsonToPy:
         for func in self.funcs:
             args = []
             for arg in func["params"]:
-                args.append(self.snake(arg["name"]))
+                if arg["name"] == "resolve":
+                    pass
+                elif arg["name"] == "reject":
+                    pass
+                else:
+                    args.append(self.snake(arg["name"]))
 
             with self.m.def_("anonymous" + str(self.func_count), *args):
-                for line in func["body"]["body"]:
-                    self.get_statement(line)
-            self.func_names.append("anonymous" + str(self.func_count))
-            self.func_count += 1
+                funcname = str(self.func_count)
+                self.func_count += 1
+                if not func["body"]["body"]:
+                    self.m.stmt("pass")
+                else:
+                    for line in func["body"]["body"]:
+                        self.get_statement(line)
+                if func["params"] and func["params"][0]["name"] == "resolve":
+                    # TODO: returnダブりないか？                    
+                    self.m.stmt("return future")
+            self.func_names.append("anonymous" + funcname)
+            
             # self.func_args.append(func["params"])
         self.funcs = []
         self.func_flag = False
