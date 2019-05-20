@@ -286,6 +286,8 @@ class JsonToPy:
         if exp["type"] == "Identifier":
             if exp["name"] == "parseInt":
                 return "int"
+            elif exp["name"] == "undefined":
+                return "None"
             return self.snake(exp["name"])
 
         if exp["type"] == "FunctionExpression":
@@ -372,7 +374,7 @@ class JsonToPy:
                 if "name" in exp["property"]:
                     name = self.snake(exp["property"]["name"])
                     return (self.get_expression(exp["object"]) +
-                            "[" + exp["property"]["name"] +
+                            "[" + name +
                             "]")
                 return (self.get_expression(exp["object"]) +
                         "[" + self.get_expression(exp["property"]) +
@@ -380,6 +382,8 @@ class JsonToPy:
             name = self.snake(exp["property"]["name"])
             if name == "bind":
                 return self.get_expression(exp["object"])
+            elif name == "length":
+                return "len(" + self.get_expression(exp["object"]) + ")"
             if "object" in exp:
                 return self.get_expression(exp["object"]) + "." + name
             return name
